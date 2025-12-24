@@ -65,6 +65,27 @@ const strings = new LocalizedStrings({
     CANCEL_BOOKING: '¿Está seguro de que desea cancelar esta reserva?',
     CANCEL_BOOKING_REQUEST_SENT: 'Su solicitud de cancelación ha sido recibida. Nos pondremos en contacto con usted para finalizar el procedimiento de cancelación.',
   },
+  hr: {
+    CAR: 'Automobil',
+    SUPPLIER: 'Dobavljač',
+    DRIVER: 'Vozač',
+    PRICE: 'Cijena',
+    STATUS: 'Status',
+    UPDATE_SELECTION: 'Uredi odabir',
+    DELETE_SELECTION: 'Obriši odabir',
+    UPDATE_STATUS: 'Promjena statusa',
+    NEW_STATUS: 'Novi status',
+    DELETE_BOOKING: 'Jeste li sigurni da želite obrisati ovu rezervaciju?',
+    DELETE_BOOKINGS: 'Jeste li sigurni da želite obrisati odabrane rezervacije?',
+    EMPTY_LIST: 'Nema rezervacija.',
+    VIEW: 'Pogledaj ovu rezervaciju',
+    UPDATE: 'Uredi ovu rezervaciju',
+    DAYS: 'Dani',
+    COST: 'Ukupno',
+    CANCEL: 'Otkaži ovu rezervaciju',
+    CANCEL_BOOKING: 'Jeste li sigurni da želite otkazati ovu rezervaciju?',
+    CANCEL_BOOKING_REQUEST_SENT: 'Vaš zahtjev za otkazivanje je primljen. Kontaktirat ćemo vas kako bismo dovršili proceduru otkazivanja.',
+  },
 })
 
 langHelper.setLanguage(strings)

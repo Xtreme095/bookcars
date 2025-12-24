@@ -180,7 +180,70 @@ Si tiene alguna pregunta sobre esta Política de Privacidad o nuestras práctica
 
 9. Reconocimiento
 
-Al utilizar nuestros servicios, usted reconoce que ha leído y comprendido esta Política de Privacidad y acepta sus términos.    
+Al utilizar nuestros servicios, usted reconoce que ha leído y comprendido esta Política de Privacidad y acepta sus términos.
+    `,
+  },
+  hr: {
+    TITLE: 'Politika privatnosti',
+    PRIVACY_POLICY: `
+Vaša privatnost je važna za nas u ${env.WEBSITE_NAME}. Ova Politika privatnosti opisuje kako prikupljamo, koristimo i štitimo vaše podatke kada koristite našu web stranicu i usluge. Pristupanjem našim uslugama, pristajete na prakse opisane u ovoj politici.
+
+
+1. Informacije koje prikupljamo
+
+Prikupljamo informacije od vas kada se registrirate na našoj stranici, naručite ili komunicirate s našim uslugama. Informacije koje možemo prikupiti uključuju:
+
+Ime
+Adresa e-pošte
+Telefonski broj
+Informacije o plaćanju
+Preferencije najma
+Možete posjetiti našu stranicu anonimno, ali određene funkcionalnosti mogu biti ograničene.
+
+
+2. Kako koristimo vaše podatke
+
+Vaši podaci mogu se koristiti na sljedeće načine:
+
+Za obradu vaših rezervacija i plaćanja
+Za poboljšanje korisničke službe
+Za slanje periodičnih e-mailova u vezi s vašom narudžbom ili drugim proizvodima i uslugama
+Za odgovaranje na upite i zahtjeve za podršku
+
+
+3. Kako štitimo vaše podatke
+
+Provodimo razne sigurnosne mjere kako bismo održali sigurnost vaših osobnih podataka. Sve osjetljive informacije prenose se putem sigurnih poslužitelja i dostupne su samo ovlaštenom osoblju. Ne pohranjujemo informacije o vašoj kreditnoj kartici na našim poslužiteljima.
+
+
+4. Dijeljenje vaših podataka
+
+Ne prodajemo, ne trgujemo niti na drugi način prenosimo vaše osobne podatke trećim stranama, osim pouzdanim partnerima koji nam pomažu u radu naše web stranice, vođenju našeg poslovanja ili pružanju usluga vama, sve dok te strane pristanu čuvati te informacije povjerljivima. Također možemo objaviti vaše podatke kada vjerujemo da je objavljivanje prikladno kako bismo se uskladili sa zakonom, primijenili politike naše stranice ili zaštitili naša prava ili prava, imovinu ili sigurnost drugih.
+
+
+5. Privatnost djece
+
+Pridržavamo se Zakona o zaštiti privatnosti djece na internetu (COPPA). Naše usluge nisu namijenjene djeci mlađoj od 13 godina i ne prikupljamo svjesno osobne podatke od djece mlađe od 13 godina. Ako saznamo da smo prikupili osobne podatke od djeteta mlađeg od 13 godina, poduzet ćemo korake za brisanje tih podataka.
+
+
+6. Promjene naše Politike privatnosti
+
+Možemo povremeno ažurirati ovu Politiku privatnosti. Obavijestit ćemo vas o svim promjenama objavljivanjem nove Politike privatnosti na ovoj stranici. Savjetujemo vam da povremeno pregledate ovu Politiku privatnosti kako biste bili upoznati s bilo kakvim promjenama.
+
+
+7. Vaša prava
+
+Imate pravo zatražiti pristup osobnim podacima koje imamo o vama, zatražiti ispravak bilo kakvih netočnosti i zatražiti brisanje svojih osobnih podataka, uz određene iznimke. Kako biste ostvarili ta prava, kontaktirajte nas koristeći informacije navedene u nastavku.
+
+
+8. Kontaktirajte nas
+
+Ako imate bilo kakvih pitanja o ovoj Politici privatnosti ili našim praksama u vezi s podacima, kontaktirajte nas na ${env.CONTACT_EMAIL}. Posvećeni smo rješavanju vaših problema i zaštiti vaše privatnosti.
+
+
+9. Priznanje
+
+Korištenjem naših usluga, potvrđujete da ste pročitali i razumjeli ovu Politiku privatnosti te se slažete s njezinim uvjetima.
     `,
   },
 })

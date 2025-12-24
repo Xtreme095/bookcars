@@ -30,6 +30,15 @@ const strings = new LocalizedStrings({
     CONTENT2: 'Disfruta de una comodidad, fiabilidad y valor inigualables con nuestro servicio de alquiler de coches de primera calidad. Desde reservas sencillas hasta vehículos de alta calidad, somos tu socio de viajes de confianza.',
     FIND_DEAL: 'Buscar oferta',
   },
+  hr: {
+    TITLE1: `${env.WEBSITE_NAME} - Vaša usluga najma automobila`,
+    SUBTITLE1: 'Vaš pouzdani partner za najam automobila',
+    CONTENT1: `U ${env.WEBSITE_NAME}, razumijemo da je svako putovanje jedinstveno. Posvećeni smo pružanju našim klijentima raznolikog izbora vozila koja zadovoljavaju sve potrebe putovanja. Bez obzira istražujete li grad, putujete poslovno ili tražite avanturu, naše pouzdane usluge najma automobila osiguravaju da vaša avantura započne besprijekorno. Naša misija je pružiti iznimnu korisničku uslugu, čineći vaše iskustvo ugodnim i bez stresa. S konkurentnim cijenama, raznolikim izborom dobro održavanih vozila i predanim timom spremnim da vam pomogne, nastojimo biti vaš pouzdani partner na cesti. Odaberite ${env.WEBSITE_NAME} za sve vaše potrebe najma automobila i doživite slobodu istraživanja vlastitim tempom.`,
+    TITLE2: `Zašto odabrati ${env.WEBSITE_NAME}`,
+    SUBTITLE2: 'Doživite izvrsnost na svakom putovanju',
+    CONTENT2: 'Uživajte u neusporedivoj praktičnosti, pouzdanosti i vrijednosti s našom vrhunskom uslugom najma automobila. Od jednostavnih rezervacija do visokokvalitetnih vozila, mi smo vaš pouzdani partner za putovanja.',
+    FIND_DEAL: 'Pronađi ponudu',
+  },
 })
 
 langHelper.setLanguage(strings)

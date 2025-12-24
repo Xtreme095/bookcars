@@ -38,6 +38,18 @@ const strings = new LocalizedStrings({
     FAQ_CANCEL_TITLE: '¿Qué sucede si necesito cancelar mi reserva?',
     FAQ_CANCEL_TEXT: 'Entendemos que los planes pueden cambiar, por eso ofrecemos políticas de cancelación flexibles. Según el momento de tu cancelación, pueden aplicarse cargos. Consulta nuestros términos y condiciones o comunícate con nuestro equipo de atención al cliente para obtener ayuda con las cancelaciones.',
   },
+  hr: {
+    FAQ_TITLE: 'Često postavljana pitanja',
+    MORE_QUESTIONS: 'Imate još pitanja?',
+    FAQ_DOCUMENTS_TITLE: 'Koje dokumente trebam za najam vozila?',
+    FAQ_DOCUMENTS_TEXT: 'Za najam vozila obično vam je potrebna važeća vozačka dozvola, kreditna kartica za plaćanje i sigurnosni depozit te dokaz o osiguranju. Dodatni zahtjevi mogu varirati ovisno o vašoj lokaciji i vrsti vozila koje najavljujete.',
+    FAQ_SERVICES_TITLE: 'Nudite li usluge dostave i preuzimanja?',
+    FAQ_SERVICES_TEXT: 'Da, nudimo! Nudimo praktične usluge dostave i preuzimanja na različitim lokacijama, uključujući zračne luke, hotele i još mnogo toga. Samo nam javite željenu lokaciju i mi ćemo se pobrinuti za ostalo.',
+    FAQ_AGE_TITLE: 'Postoji li dobna granica za najam vozila?',
+    FAQ_AGE_TEXT: 'Da, minimalna dobna granica za najam vozila obično je 18 godina. Međutim, neke lokacije mogu imati više dobne zahtjeve ili dodatna ograničenja za određene vrste vozila.',
+    FAQ_CANCEL_TITLE: 'Što se događa ako moram otkazati svoju rezervaciju?',
+    FAQ_CANCEL_TEXT: 'Razumijemo da se planovi mogu promijeniti, stoga nudimo fleksibilne politike otkazivanja. Ovisno o vremenu vašeg otkazivanja, mogu se primijeniti naknade. Molimo pogledajte naše uvjete korištenja ili kontaktirajte naš tim za korisničku podršku za pomoć pri otkazivanju.',
+  },
 })
 
 langHelper.setLanguage(strings)

@@ -53,6 +53,22 @@ const strings = new LocalizedStrings({
     FAQ: 'Preguntas frecuentes',
     COOKIE_POLICY: 'Política de Cookies',
   },
+  hr: {
+    COPYRIGHT_PART1,
+    COPYRIGHT_PART2: '. Sva prava pridržana.',
+    CORPORATE: 'Korporativno',
+    ABOUT: 'O nama',
+    TOS: 'Uvjeti korištenja',
+    RENT: 'Iznajmi automobil',
+    SUPPLIERS: 'Dobavljači',
+    LOCATIONS: 'Lokacije',
+    SUPPORT: 'Podrška',
+    CONTACT: 'Kontakt',
+    SECURE_PAYMENT: `100% sigurno plaćanje s ${env.WEBSITE_NAME}`,
+    PRIVACY_POLICY: 'Politika privatnosti',
+    FAQ: 'Često postavljana pitanja',
+    COOKIE_POLICY: 'Politika kolačića',
+  },
 })
 
 langHelper.setLanguage(strings)

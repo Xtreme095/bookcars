@@ -11,6 +11,9 @@ const strings = new LocalizedStrings({
   es: {
     VIEW_ON_MAP: 'Ver en el mapa',
   },
+  hr: {
+    VIEW_ON_MAP: 'Prikaži na karti',
+  },
 })
 
 langHelper.setLanguage(strings)

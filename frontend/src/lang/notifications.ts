@@ -35,6 +35,17 @@ const strings = new LocalizedStrings({
     DELETE_NOTIFICATION: '¿Está seguro de que desea eliminar esta notificación?',
     DELETE_NOTIFICATIONS: '¿Está seguro de que desea eliminar estas notificaciones?',
   },
+  hr: {
+    EMPTY_LIST: 'Nema obavijesti',
+    VIEW: 'Pregledaj',
+    MARK_AS_READ: 'Označi kao pročitano',
+    MARK_AS_UNREAD: 'Označi kao nepročitano',
+    MARK_ALL_AS_READ: 'Označi sve kao pročitano',
+    MARK_ALL_AS_UNREAD: 'Označi sve kao nepročitano',
+    DELETE_ALL: 'Obriši sve',
+    DELETE_NOTIFICATION: 'Jeste li sigurni da želite obrisati ovu obavijest?',
+    DELETE_NOTIFICATIONS: 'Jeste li sigurni da želite obrisati ove obavijesti?',
+  },
 })
 
 langHelper.setLanguage(strings)

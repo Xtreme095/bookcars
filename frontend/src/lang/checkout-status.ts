@@ -27,6 +27,14 @@ const strings = new LocalizedStrings({
     STATUS_TITLE: `${env.WEBSITE_NAME} Confirmación de reserva`,
     STATUS_MESSAGE: 'Revise su buzón de correo y siga los pasos descritos en el correo electrónico de confirmación de reserva para reservar su vehículo.',
   },
+  hr: {
+    CONGRATULATIONS: 'Čestitamo!',
+    SUCCESS: 'Vaša uplata je uspješno izvršena. Poslali smo vam e-mail potvrde.',
+    SUCCESS_PAY_LATER: 'Vaša rezervacija je uspješno izvršena. Poslali smo vam e-mail potvrde.',
+    ERROR: 'Nešto je pošlo po zlu! Pokušajte ponovo kasnije',
+    STATUS_TITLE: `${env.WEBSITE_NAME} Potvrda rezervacije`,
+    STATUS_MESSAGE: 'Provjerite svoj poštanski sandučić i slijedite korake opisane u e-mailu potvrde rezervacije za rezervaciju vašeg automobila.',
+  },
 })
 
 langHelper.setLanguage(strings)

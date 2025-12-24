@@ -50,6 +50,22 @@ const strings = new LocalizedStrings({
     FAQ: 'Preguntas frecuentes',
     COOKIE_POLICY: 'Política de Cookies',
   },
+  hr: {
+    SIGN_IN: 'Prijavi se',
+    HOME: 'Početna',
+    BOOKINGS: 'Rezervacije',
+    ABOUT: 'O nama',
+    TOS: 'Uvjeti pružanja usluge',
+    CONTACT: 'Kontakt',
+    LANGUAGE: 'Jezik',
+    SETTINGS: 'Postavke',
+    SIGN_OUT: 'Odjavi se',
+    SUPPLIERS: 'Dobavljači',
+    LOCATIONS: 'Lokacije',
+    PRIVACY_POLICY: 'Politika privatnosti',
+    FAQ: 'Često postavljana pitanja',
+    COOKIE_POLICY: 'Politika kolačića',
+  },
 })
 
 langHelper.setLanguage(strings)

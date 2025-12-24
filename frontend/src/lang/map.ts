@@ -14,6 +14,10 @@ const strings = new LocalizedStrings({
     SELECT_PICK_UP_LOCATION: 'Seleccionar ubicación',
     SELECT_DROP_OFF_LOCATION: 'Establecer como ubicación de entrega',
   },
+  hr: {
+    SELECT_PICK_UP_LOCATION: 'Odaberi lokaciju',
+    SELECT_DROP_OFF_LOCATION: 'Postavi kao lokaciju vraćanja',
+  },
 })
 
 langHelper.setLanguage(strings)

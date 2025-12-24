@@ -153,6 +153,56 @@ Podemos actualizar esta Política de Cookies ocasionalmente para reflejar cambio
 Si tiene alguna pregunta sobre esta Política de Cookies, puede contactarnos en: ${env.CONTACT_EMAIL}
     `,
   },
+  hr: {
+    TITLE: 'Politika kolačića',
+    POLICY: `
+Ova Politika kolačića objašnjava kako ${env.WEBSITE_NAME} ("mi", "naš" ili "naša") koristi kolačiće i slične tehnologije na našoj web stranici. Korištenjem naše web stranice, pristajete na korištenje kolačića kako je opisano u ovoj politici.
+
+1. Što su kolačići?
+
+Kolačići su male tekstualne datoteke koje se pohranjuju na vašem uređaju (računalo, tablet, pametni telefon) kada posjetite web stranicu. Oni pomažu poboljšati vaše iskustvo pregledavanja zapamćujući vaše postavke i pružajući relevantne informacije ili usluge.
+
+2. Vrste kolačića koje koristimo
+
+Koristimo sljedeće vrste kolačića:
+
+- Strogo potrebni kolačići: Ovi kolačići su neophodni za rad web stranice i ne mogu se isključiti u našim sustavima.
+- Kolačići izvedbe: Ovi kolačići nam pomažu razumjeti kako posjetitelji komuniciraju s našom web stranicom prikupljanjem i izvještavanjem informacija anonimno.
+- Funkcionalni kolačići: Ovi kolačići omogućuju web stranici pružanje poboljšane funkcionalnosti i personalizacije.
+- Ciljani/Oglašivački kolačići: Ovi kolačići se koriste za isporuku relevantnih oglasa i praćenje performansi oglasa.
+
+3. Kako koristimo kolačiće
+
+Koristimo kolačiće za:
+
+- Poboljšanje funkcionalnosti i izvedbe web stranice.
+- Analizu korištenja stranice kako bismo poboljšali naše usluge.
+- Personalizaciju vašeg iskustva i pamćenje vaših postavki.
+- Isporuku ciljanih oglasa na temelju vaših interesa.
+
+4. Upravljanje vašim postavkama kolačića
+
+Možete upravljati svojim postavkama kolačića u bilo kojem trenutku prilagodbom postavki u vašem pregledniku. Većina preglednika vam omogućuje da:
+
+- Blokirate sve kolačiće.
+- Izbrišete postojeće kolačiće.
+- Primite obavijesti kada je kolačić postavljen.
+
+Imajte na umu da onemogućavanje kolačića može utjecati na vaše iskustvo na našoj web stranici.
+
+5. Kolačići trećih strana
+
+Možemo dopustiti pružateljima usluga trećih strana da postavljaju kolačiće na našoj web stranici za analizu prometa, pružanje oglašivačkih usluga ili omogućavanje dodatnih značajki. Ovi kolačići se uređuju politikama privatnosti trećih strana.
+
+6. Promjene ove Politike kolačića
+
+Možemo povremeno ažurirati ovu Politiku kolačića kako bismo odrazili promjene u tehnologiji, zakonodavstvu ili našim praksama. Ažurirana politika bit će objavljena na ovoj stranici s revidiranim datumom "Zadnje ažurirano".
+
+7. Kontaktirajte nas
+
+Ako imate bilo kakvih pitanja o ovoj Politici kolačića, kontaktirajte nas na: ${env.CONTACT_EMAIL}
+    `,
+  },
 })
 
 langHelper.setLanguage(strings)

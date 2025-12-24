@@ -29,6 +29,15 @@ const strings = new LocalizedStrings({
     INVALID_PICK_UP_TIME: 'Hora de recogida no válida',
     INVALID_DROP_OFF_TIME: 'Hora de devolución no válida',
   },
+  hr: {
+    PICK_UP_DATE: 'Datum preuzimanja',
+    DROP_OFF_DATE: 'Datum vraćanja',
+    DROP_OFF: 'Vrati na isto mjesto',
+    MIN_PICK_UP_HOURS_ERROR: 'Vrijeme preuzimanja mora biti najmanje nekoliko sati unaprijed',
+    MIN_RENTAL_HOURS_ERROR: 'Trajanje najma je prekratko',
+    INVALID_PICK_UP_TIME: 'Nevažeće vrijeme preuzimanja',
+    INVALID_DROP_OFF_TIME: 'Nevažeće vrijeme vraćanja',
+  },
 })
 
 langHelper.setLanguage(strings)

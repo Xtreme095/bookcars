@@ -20,6 +20,12 @@ const strings = new LocalizedStrings({
     VALIDATION_EMAIL_SENT: 'Correo electrónico de validación enviado.',
     VALIDATION_EMAIL_ERROR: 'Se produjo un error al enviar el correo electrónico de validación.',
   },
+  hr: {
+    VALIDATE_EMAIL: 'E-mail potvrde poslan je na vašu adresu e-pošte. Molimo provjerite svoj poštanski sandučić i potvrdite svoj račun klikom na link u e-mailu. Link će isteći nakon jednog dana. Ako niste primili e-mail potvrde, kliknite na ponovno pošalji.',
+    RESEND: 'Pošalji ponovno',
+    VALIDATION_EMAIL_SENT: 'E-mail potvrde poslan.',
+    VALIDATION_EMAIL_ERROR: 'Došlo je do greške prilikom slanja e-maila potvrde.',
+  },
 })
 
 langHelper.setLanguage(strings)
