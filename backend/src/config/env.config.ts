@@ -506,6 +506,38 @@ export interface User extends Document {
   priceChangeRate?: number
   supplierCarLimit?: number
   notifyAdminOnNewCar?: boolean
+
+  // Commission settings (for suppliers)
+  commissionType?: 'flat' | 'percentage'
+  commissionPercentage?: number
+  commissionFlat?: number
+
+  // Payout settings (for suppliers)
+  bankAccountHolder?: string
+  bankName?: string
+  iban?: string
+  swiftBic?: string
+
+  // Tiering (for suppliers)
+  tier?: 'basic' | 'silver' | 'gold'
+  tierCommissionRate?: number
+
+  // Financial tracking (for suppliers)
+  totalRevenue?: number
+  currentMonthBookings?: number
+  lastPayoutDate?: Date
+  pendingPayout?: number
+
+  // Croatian business info (for suppliers)
+  companyName?: string
+  oib?: string
+  companyAddress?: string
+  companyCity?: string
+  companyZip?: string
+
+  // Verification (for suppliers)
+  businessVerified?: boolean
+  verificationDocuments?: string[]
 }
 
 /**
@@ -888,8 +920,8 @@ export interface BankDetails extends Document {
  * Setting Document.
  *
  * @export
- * @interface BankDetails
- * @typedef {BankDetails}
+ * @interface Setting
+ * @typedef {Setting}
  * @extends {Document}
  */
 export interface Setting extends Document {
@@ -897,4 +929,32 @@ export interface Setting extends Document {
   minRentalHours: number
   minPickupDropoffHour: number
   maxPickupDropoffHour: number
+}
+
+/**
+ * CommissionTransaction Document.
+ *
+ * @export
+ * @interface CommissionTransaction
+ * @typedef {CommissionTransaction}
+ * @extends {Document}
+ */
+export interface CommissionTransaction extends Document {
+  booking: Types.ObjectId
+  supplier: Types.ObjectId
+  totalBookingAmount: number
+  supplierEarnings: number
+  platformCommission: number
+  commissionType: 'flat' | 'percentage'
+  commissionValue: number
+  paymentGatewayFee: number
+  netRevenue: number
+  pdvRate: number
+  pdvAmount: number
+  payoutStatus: 'pending' | 'processing' | 'paid' | 'failed'
+  payoutDate?: Date
+  payoutMethod: 'bank_transfer' | 'hold' | 'manual'
+  payoutReference?: string
+  invoice?: string
+  invoiceNumber?: string
 }

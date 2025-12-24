@@ -141,6 +141,117 @@ const userSchema = new Schema<env.User>(
       type: Date,
       index: { name: USER_EXPIRE_AT_INDEX_NAME, expireAfterSeconds: env.USER_EXPIRE_AT, background: true },
     },
+
+    // Commission settings (for suppliers)
+    commissionType: {
+      type: String,
+      enum: ['flat', 'percentage'],
+      default: 'percentage',
+    },
+    commissionPercentage: {
+      type: Number,
+      default: 15, // Default 15% commission for basic tier
+      min: 0,
+      max: 100,
+    },
+    commissionFlat: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
+    // Payout settings (for suppliers)
+    bankAccountHolder: {
+      type: String,
+      trim: true,
+    },
+    bankName: {
+      type: String,
+      trim: true,
+    },
+    iban: {
+      type: String,
+      trim: true,
+      uppercase: true,
+    },
+    swiftBic: {
+      type: String,
+      trim: true,
+      uppercase: true,
+    },
+
+    // Tiering (for suppliers)
+    tier: {
+      type: String,
+      enum: ['basic', 'silver', 'gold'],
+      default: 'basic',
+    },
+    tierCommissionRate: {
+      type: Number,
+      min: 0,
+      max: 100,
+    },
+
+    // Financial tracking (for suppliers)
+    totalRevenue: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    currentMonthBookings: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    lastPayoutDate: {
+      type: Date,
+    },
+    pendingPayout: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
+    // Croatian business info (for suppliers)
+    companyName: {
+      type: String,
+      trim: true,
+    },
+    oib: {
+      type: String,
+      trim: true,
+      validate: {
+        validator: (value: string) => {
+          // OIB must be empty or exactly 11 digits
+          if (!value) {
+            return true
+          }
+          return /^\d{11}$/.test(value)
+        },
+        message: 'OIB must be exactly 11 digits',
+      },
+    },
+    companyAddress: {
+      type: String,
+      trim: true,
+    },
+    companyCity: {
+      type: String,
+      trim: true,
+    },
+    companyZip: {
+      type: String,
+      trim: true,
+    },
+
+    // Verification (for suppliers)
+    businessVerified: {
+      type: Boolean,
+      default: false,
+    },
+    verificationDocuments: [{
+      type: String,
+    }],
   },
   {
     timestamps: true,

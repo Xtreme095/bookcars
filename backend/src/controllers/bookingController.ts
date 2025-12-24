@@ -16,11 +16,83 @@ import Notification from '../models/Notification'
 import NotificationCounter from '../models/NotificationCounter'
 import PushToken from '../models/PushToken'
 import AdditionalDriver from '../models/AdditionalDriver'
+import CommissionTransaction from '../models/CommissionTransaction'
 import * as helper from '../utils/helper'
 import * as mailHelper from '../utils/mailHelper'
+import * as commissionHelper from '../utils/commissionHelper'
 import * as env from '../config/env.config'
 import * as logger from '../utils/logger'
 import stripeAPI from '../payment/stripe'
+
+/**
+ * Create commission transaction for a paid booking.
+ *
+ * @async
+ * @param {env.Booking} booking
+ * @param {env.User} supplier
+ * @param {string} paymentMethod
+ * @returns {Promise<void>}
+ */
+const createCommissionTransaction = async (
+  booking: env.Booking,
+  supplier: env.User,
+  paymentMethod: string = 'stripe',
+): Promise<void> => {
+  try {
+    // Calculate commission
+    const calculation = await commissionHelper.calculateCommission(supplier, booking.price, paymentMethod)
+
+    // Generate invoice number
+    const invoiceNumber = await commissionHelper.generateInvoiceNumber()
+
+    // Create commission transaction
+    const commissionTransaction = new CommissionTransaction({
+      booking: booking._id,
+      supplier: supplier._id,
+      totalBookingAmount: booking.price,
+      supplierEarnings: calculation.supplierEarnings,
+      platformCommission: calculation.platformCommission,
+      commissionType: calculation.commissionType,
+      commissionValue: calculation.commissionRate,
+      paymentGatewayFee: calculation.paymentGatewayFee,
+      netRevenue: calculation.netRevenue,
+      pdvRate: calculation.pdvRate,
+      pdvAmount: calculation.pdvAmount,
+      payoutStatus: 'pending',
+      payoutMethod: 'bank_transfer',
+      invoiceNumber,
+    })
+
+    await commissionTransaction.save()
+
+    // Update supplier's financial tracking
+    await User.findByIdAndUpdate(supplier._id, {
+      $inc: {
+        totalRevenue: calculation.supplierEarnings,
+        currentMonthBookings: 1,
+        pendingPayout: calculation.supplierEarnings,
+      },
+    })
+
+    // Check for tier upgrade
+    const tierUpgrade = await commissionHelper.checkTierUpgrade(supplier._id.toString())
+    if (tierUpgrade) {
+      await User.findByIdAndUpdate(supplier._id, {
+        tier: tierUpgrade.newTier,
+        tierCommissionRate: tierUpgrade.newCommissionRate,
+      })
+
+      logger.info(`Supplier ${supplier._id} upgraded from ${tierUpgrade.oldTier} to ${tierUpgrade.newTier}`)
+
+      // TODO: Send tier upgrade notification email to supplier
+    }
+
+    logger.info(`Commission transaction created for booking ${booking._id}`)
+  } catch (err) {
+    logger.error(`[bookingController.createCommissionTransaction] Error creating commission for booking ${booking._id}: ${err}`)
+    // Don't throw error - booking should still succeed even if commission fails
+  }
+}
 
 /**
  * Create a Booking.
@@ -344,6 +416,9 @@ export const checkout = async (req: Request, res: Response) => {
       }
       car.trips += 1
       await car.save()
+
+      // Create commission transaction
+      await createCommissionTransaction(booking, supplier, body.paymentMethod || 'stripe')
     }
 
     if (body.payLater || (booking.status === bookcarsTypes.BookingStatus.Paid && body.paymentIntentId && body.customerId)) {

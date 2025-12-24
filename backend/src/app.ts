@@ -20,6 +20,7 @@ import paypalRoutes from './routes/paypalRoutes'
 import ipinfoRoutes from './routes/ipinfoRoutes'
 import bankDetailsRoutes from './routes/bankDetailsRoutes'
 import settingRoutes from './routes/settingRoutes'
+import commissionRoutes from './routes/commissionRoutes'
 import * as helper from './utils/helper'
 
 const app = express()
@@ -64,6 +65,7 @@ app.use('/', paypalRoutes)
 app.use('/', ipinfoRoutes)
 app.use('/', bankDetailsRoutes)
 app.use('/', settingRoutes)
+app.use('/', commissionRoutes)
 
 if (env.ENABLE_SENTRY) {
   Sentry.setupExpressErrorHandler(app)
