@@ -33,7 +33,21 @@ export const LANGUAGES = [
   'en',
   'fr',
   'es',
+  'hr',
 ]
+
+export const DEFAULT_CURRENCY = 'EUR'
+export const CURRENCY_SYMBOL = '€'
+export const SUPPORTED_CURRENCIES = ['EUR', 'USD', 'GBP']
+export const VAT_RATE = 25
+export const CURRENCY_LOCALE = 'hr-HR'
+
+export const formatCurrency = (amount: number, currency: string = 'EUR'): string => new Intl.NumberFormat('hr-HR', {
+  style: 'currency',
+  currency,
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+}).format(amount)
 
 /**
  * Name of the field used for TTL (Time-To-Live) index expiration.
@@ -690,6 +704,34 @@ export interface Car extends Document {
   trips: number
   co2?: number
   blockOnPay?: boolean
+
+  isCargoVehicle?: boolean
+  cargoType?: 'van_small' | 'van_medium' | 'van_large' | 'pickup_truck' | 'box_truck' | 'refrigerated' | 'flatbed'
+  cargoSpecs?: {
+    volume?: number
+    capacity?: number
+    loadingDimensions?: {
+      length?: number
+      width?: number
+      height?: number
+    }
+    hasTailLift?: boolean
+    isRefrigerated?: boolean
+    hasLoadingRamp?: boolean
+    hasPartition?: boolean
+    accessType?: 'rear' | 'side' | 'both'
+  }
+  cargoHourlyRate?: number
+  cargoDailyRate?: number
+  cargoWeeklyRate?: number
+  cargoMonthlyRate?: number
+  driverIncluded?: boolean
+  driverDailyRate?: number
+  loadingAssistance?: boolean
+  loadingAssistanceRate?: number
+  cargoInsurance?: boolean
+  cargoInsuranceDailyRate?: number
+  maxCargoValue?: number
 }
 
 /**

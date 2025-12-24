@@ -210,6 +210,90 @@ const carSchema = new Schema<env.Car>(
       type: Boolean,
       default: true,
     },
+    isCargoVehicle: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    cargoType: {
+      type: String,
+      enum: ['van_small', 'van_medium', 'van_large', 'pickup_truck', 'box_truck', 'refrigerated', 'flatbed'],
+    },
+    cargoSpecs: {
+      volume: {
+        type: Number,
+      },
+      capacity: {
+        type: Number,
+      },
+      loadingDimensions: {
+        length: {
+          type: Number,
+        },
+        width: {
+          type: Number,
+        },
+        height: {
+          type: Number,
+        },
+      },
+      hasTailLift: {
+        type: Boolean,
+        default: false,
+      },
+      isRefrigerated: {
+        type: Boolean,
+        default: false,
+      },
+      hasLoadingRamp: {
+        type: Boolean,
+        default: false,
+      },
+      hasPartition: {
+        type: Boolean,
+        default: false,
+      },
+      accessType: {
+        type: String,
+        enum: ['rear', 'side', 'both'],
+      },
+    },
+    cargoHourlyRate: {
+      type: Number,
+    },
+    cargoDailyRate: {
+      type: Number,
+    },
+    cargoWeeklyRate: {
+      type: Number,
+    },
+    cargoMonthlyRate: {
+      type: Number,
+    },
+    driverIncluded: {
+      type: Boolean,
+      default: false,
+    },
+    driverDailyRate: {
+      type: Number,
+    },
+    loadingAssistance: {
+      type: Boolean,
+      default: false,
+    },
+    loadingAssistanceRate: {
+      type: Number,
+    },
+    cargoInsurance: {
+      type: Boolean,
+      default: false,
+    },
+    cargoInsuranceDailyRate: {
+      type: Number,
+    },
+    maxCargoValue: {
+      type: Number,
+    },
   },
   {
     timestamps: true,
@@ -230,6 +314,7 @@ carSchema.index({ range: 1 })
 carSchema.index({ multimedia: 1 })
 carSchema.index({ dailyPrice: 1, _id: 1 })
 carSchema.index({ dateBasedPrices: 1 })
+carSchema.index({ isCargoVehicle: 1, cargoType: 1 })
 carSchema.index(
   { name: 'text' },
   {
