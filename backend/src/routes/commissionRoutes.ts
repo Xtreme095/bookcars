@@ -53,4 +53,12 @@ routes.route(routeNames.updateSupplierCommission).put(authJwt.verifyToken, commi
  */
 routes.route(routeNames.platformStatistics).get(authJwt.verifyToken, commissionController.getPlatformStatistics)
 
+/**
+ * Generate invoice PDF for commission transaction.
+ *
+ * @name POST /api/commission/generate-invoice/:transactionId
+ * @middleware authJwt.verifyToken
+ */
+routes.route(routeNames.generateInvoice).post(authJwt.verifyToken, commissionController.generateInvoice)
+
 export default routes

@@ -1,10 +1,14 @@
 import { Request, Response } from 'express'
+import path from 'node:path'
 import * as bookcarsTypes from ':bookcars-types'
 import * as logger from '../utils/logger'
+import * as env from '../config/env.config'
 import CommissionTransaction from '../models/CommissionTransaction'
 import User from '../models/User'
 import Booking from '../models/Booking'
 import * as commissionHelper from '../utils/commissionHelper'
+import * as invoiceHelper from '../utils/invoiceHelper'
+import * as eRacuniHelper from '../utils/eRacuniHelper'
 
 /**
  * Calculate commission for a booking.
@@ -441,6 +445,159 @@ export async function getPlatformStatistics(req: Request, res: Response) {
     })
   } catch (err) {
     logger.error(`[commission.getPlatformStatistics] ${err}`)
+    return res.status(400).send(err)
+  }
+}
+
+/**
+ * Generate invoice PDF for commission transaction.
+ *
+ * @export
+ * @async
+ * @param {Request} req
+ * @param {Response} res
+ * @returns {unknown}
+ */
+export async function generateInvoice(req: Request, res: Response) {
+  try {
+    const { transactionId } = req.params
+
+    const transaction = await CommissionTransaction.findById(transactionId).populate('supplier booking')
+    if (!transaction) {
+      return res.status(404).send('Commission transaction not found')
+    }
+
+    const supplier = await User.findById(transaction.supplier)
+    if (!supplier) {
+      return res.status(404).send('Supplier not found')
+    }
+
+    const platformInfo = {
+      name: process.env.BC_PLATFORM_NAME || 'BookCars',
+      oib: process.env.BC_PLATFORM_OIB || '',
+      address: process.env.BC_PLATFORM_ADDRESS || '',
+      city: process.env.BC_PLATFORM_CITY || '',
+      zip: process.env.BC_PLATFORM_ZIP || '',
+      iban: process.env.BC_PLATFORM_IBAN || '',
+      email: process.env.BC_PLATFORM_EMAIL || '',
+    }
+
+    const invoiceData: any = {
+      invoiceNumber: transaction.invoiceNumber!,
+      invoiceDate: transaction.createdAt,
+      dueDate: new Date(transaction.createdAt.getTime() + 30 * 24 * 60 * 60 * 1000),
+
+      supplierName: supplier.fullName || supplier.companyName || 'N/A',
+      supplierOib: supplier.oib || 'N/A',
+      supplierAddress: supplier.address || supplier.companyAddress || 'N/A',
+      supplierCity: supplier.city || supplier.companyCity || 'N/A',
+      supplierZip: supplier.zip || supplier.companyZip || 'N/A',
+      supplierIban: supplier.iban || 'N/A',
+      supplierEmail: supplier.email || 'N/A',
+
+      platformName: platformInfo.name,
+      platformOib: platformInfo.oib,
+      platformAddress: platformInfo.address,
+      platformCity: platformInfo.city,
+      platformZip: platformInfo.zip,
+      platformIban: platformInfo.iban,
+      platformEmail: platformInfo.email,
+
+      items: [
+        {
+          description: `Provizija za rezervaciju - ${transaction.invoiceNumber}`,
+          quantity: 1,
+          unitPrice: transaction.platformCommission,
+          total: transaction.platformCommission,
+          vatRate: transaction.pdvRate,
+          vatAmount: transaction.pdvAmount,
+        },
+      ],
+
+      subtotal: transaction.platformCommission - transaction.pdvAmount,
+      totalVat: transaction.pdvAmount,
+      total: transaction.platformCommission,
+
+      paymentMethod: transaction.payoutMethod === 'bank_transfer' ? 'Bankovni prijenos' : 'Ostalo',
+      bookingReference: transaction.booking?.toString(),
+      notes: `Neto prihod platforme: ${env.formatCurrency(transaction.netRevenue)}. Naknada za obradu plaćanja: ${env.formatCurrency(transaction.paymentGatewayFee)}.`,
+    }
+
+    const invoiceDir = path.join(env.CDN_ROOT, 'invoices')
+    const filename = invoiceHelper.generateInvoiceFilename(transaction.invoiceNumber!)
+    const invoicePath = path.join(invoiceDir, filename)
+
+    await invoiceHelper.generateInvoicePDF(invoiceData, invoicePath)
+
+    transaction.invoice = `/invoices/${filename}`
+    await transaction.save()
+
+    if (eRacuniHelper.eRacuniService.isEnabled()) {
+      try {
+        const eRacuniInvoice: any = {
+          invoiceNumber: transaction.invoiceNumber,
+          invoiceDate: transaction.createdAt.toISOString().split('T')[0],
+          dueDate: invoiceData.dueDate.toISOString().split('T')[0],
+
+          issuerName: platformInfo.name,
+          issuerOib: platformInfo.oib,
+          issuerAddress: platformInfo.address,
+          issuerCity: platformInfo.city,
+          issuerZip: platformInfo.zip,
+          issuerIban: platformInfo.iban,
+          issuerEmail: platformInfo.email,
+
+          recipientName: supplier.fullName || supplier.companyName || '',
+          recipientOib: supplier.oib || '',
+          recipientAddress: supplier.address || supplier.companyAddress || '',
+          recipientCity: supplier.city || supplier.companyCity || '',
+          recipientZip: supplier.zip || supplier.companyZip || '',
+          recipientEmail: supplier.email || '',
+
+          items: invoiceData.items,
+          subtotal: invoiceData.subtotal,
+          totalVat: invoiceData.totalVat,
+          total: invoiceData.total,
+          currency: 'EUR',
+
+          paymentMethod: transaction.payoutMethod || 'bank_transfer',
+          reference: transaction.booking?.toString(),
+          notes: invoiceData.notes,
+        }
+
+        const eRacuniResponse = await eRacuniHelper.eRacuniService.sendInvoice(eRacuniInvoice)
+
+        logger.info('Invoice sent to e-Računi', {
+          transactionId: transaction._id,
+          invoiceNumber: transaction.invoiceNumber,
+          success: eRacuniResponse.success,
+          jir: eRacuniResponse.jir,
+        })
+
+        return res.json({
+          success: true,
+          invoicePath: `/invoices/${filename}`,
+          eRacuni: eRacuniResponse,
+        })
+      } catch (eRacuniErr) {
+        logger.error('e-Računi submission failed, but invoice PDF generated', eRacuniErr)
+        return res.json({
+          success: true,
+          invoicePath: `/invoices/${filename}`,
+          eRacuni: {
+            success: false,
+            message: 'e-Računi submission failed',
+          },
+        })
+      }
+    }
+
+    return res.json({
+      success: true,
+      invoicePath: `/invoices/${filename}`,
+    })
+  } catch (err) {
+    logger.error(`[commission.generateInvoice] ${err}`)
     return res.status(400).send(err)
   }
 }
