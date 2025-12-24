@@ -681,9 +681,9 @@ export interface SubmitReviewPayload {
 export interface ReviewInfo {
   _id: string
   booking: string
-  car: string | CarInfo
-  supplier: string | UserInfo
-  customer: string | UserInfo
+  car: string | Car
+  supplier: string | User
+  customer: string | User
   overallRating: number
   vehicleConditionRating: number
   valueForMoneyRating: number

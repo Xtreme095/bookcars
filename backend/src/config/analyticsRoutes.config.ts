@@ -1,0 +1,7 @@
+export const ANALYTICS_OVERVIEW = '/api/analytics/overview'
+export const ANALYTICS_REVENUE = '/api/analytics/revenue'
+export const ANALYTICS_BOOKINGS = '/api/analytics/bookings'
+export const ANALYTICS_VEHICLES = '/api/analytics/vehicles'
+export const ANALYTICS_CUSTOMERS = '/api/analytics/customers'
+export const ANALYTICS_SUPPLIERS = '/api/analytics/suppliers'
+export const ANALYTICS_GENERATE_SUMMARY = '/api/admin/analytics/generate-summary'
