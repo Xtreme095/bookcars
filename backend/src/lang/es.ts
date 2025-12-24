@@ -48,4 +48,14 @@ export const es = {
   LOCATION_IMAGE_NOT_FOUND: 'Imagen del lugar no encontrada',
   NEW_CAR_NOTIFICATION_PART1: 'El proveedor ',
   NEW_CAR_NOTIFICATION_PART2: ' creó un nuevo coche.',
+
+  NEW_REVIEW_SUBJECT: 'Nueva reseña recibida',
+  NEW_REVIEW_BODY:
+    `Hola {{supplierName}},<br><br>`
+    + `Ha recibido una nueva reseña de {{customerName}} para su vehículo <strong>{{carName}}</strong>.<br><br>`
+    + `Calificación: {{rating}}/5 estrellas<br>`
+    + `Reserva: #{{bookingId}}<br><br>`
+    + `La reseña está pendiente de moderación y se publicará una vez aprobada.<br>`
+    + `Puede ver y responder a esta reseña en su panel de control.<br><br>`
+    + `Saludos cordiales,<br>El equipo de BookCars`,
 }

@@ -48,4 +48,14 @@ export const hr = {
   LOCATION_IMAGE_NOT_FOUND: 'Slika lokacije nije pronađena',
   NEW_CAR_NOTIFICATION_PART1: 'Dobavljač ',
   NEW_CAR_NOTIFICATION_PART2: ' je kreirao novi automobil.',
+
+  NEW_REVIEW_SUBJECT: 'Nova recenzija primljena',
+  NEW_REVIEW_BODY:
+    `Pozdrav {{supplierName}},<br><br>`
+    + `Primili ste novu recenziju od {{customerName}} za vaše vozilo <strong>{{carName}}</strong>.<br><br>`
+    + `Ocjena: {{rating}}/5 zvjezdica<br>`
+    + `Rezervacija: #{{bookingId}}<br><br>`
+    + `Recenzija trenutno čeka moderaciju i bit će objavljena nakon odobrenja.<br>`
+    + `Možete vidjeti i odgovoriti na ovu recenziju na svojoj nadzornoj ploči.<br><br>`
+    + `Srdačan pozdrav,<br>BookCars Tim`,
 }

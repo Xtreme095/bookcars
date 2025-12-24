@@ -48,4 +48,14 @@ export const fr = {
   LOCATION_IMAGE_NOT_FOUND: 'Image de lieu introuvable',
   NEW_CAR_NOTIFICATION_PART1: 'Le fournisseur ',
   NEW_CAR_NOTIFICATION_PART2: ' a créé une nouvelle voiture.',
+
+  NEW_REVIEW_SUBJECT: 'Nouvel avis reçu',
+  NEW_REVIEW_BODY:
+    `Bonjour {{supplierName}},<br><br>`
+    + `Vous avez reçu un nouvel avis de {{customerName}} pour votre véhicule <strong>{{carName}}</strong>.<br><br>`
+    + `Note : {{rating}}/5 étoiles<br>`
+    + `Réservation : #{{bookingId}}<br><br>`
+    + `L'avis est actuellement en attente de modération et sera publié une fois approuvé.<br>`
+    + `Vous pouvez consulter et répondre à cet avis dans votre tableau de bord.<br><br>`
+    + `Cordialement,<br>L'équipe BookCars`,
 }

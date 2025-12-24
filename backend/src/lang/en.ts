@@ -48,4 +48,14 @@ export const en = {
   LOCATION_IMAGE_NOT_FOUND: 'Location image not found',
   NEW_CAR_NOTIFICATION_PART1: 'The supplier ',
   NEW_CAR_NOTIFICATION_PART2: ' created a new car.',
+
+  NEW_REVIEW_SUBJECT: 'New Review Received',
+  NEW_REVIEW_BODY:
+    `Hello {{supplierName}},<br><br>`
+    + `You have received a new review from {{customerName}} for your vehicle <strong>{{carName}}</strong>.<br><br>`
+    + `Rating: {{rating}}/5 stars<br>`
+    + `Booking: #{{bookingId}}<br><br>`
+    + `The review is currently pending moderation and will be published once approved.<br>`
+    + `You can view and respond to this review in your dashboard.<br><br>`
+    + `Best regards,<br>The BookCars Team`,
 }

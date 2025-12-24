@@ -664,3 +664,46 @@ export interface CarOptions {
   fullInsurance?: boolean
   additionalDriver?: boolean
 }
+
+export interface SubmitReviewPayload {
+  bookingId: string
+  overallRating: number
+  vehicleConditionRating: number
+  valueForMoneyRating: number
+  customerServiceRating: number
+  pickupDropoffRating: number
+  title: string
+  comment: string
+  photos?: string[]
+  language?: string
+}
+
+export interface ReviewInfo {
+  _id: string
+  booking: string
+  car: string | CarInfo
+  supplier: string | UserInfo
+  customer: string | UserInfo
+  overallRating: number
+  vehicleConditionRating: number
+  valueForMoneyRating: number
+  customerServiceRating: number
+  pickupDropoffRating: number
+  title: string
+  comment: string
+  photos: string[]
+  verifiedBooking: boolean
+  helpfulCount: number
+  reportCount: number
+  status: 'pending' | 'approved' | 'rejected' | 'hidden'
+  moderatedBy?: string
+  moderatedAt?: Date
+  rejectionReason?: string
+  supplierResponse?: {
+    text: string
+    respondedAt: Date
+  }
+  language: string
+  createdAt?: Date
+  updatedAt?: Date
+}
