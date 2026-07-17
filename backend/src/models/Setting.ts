@@ -24,6 +24,14 @@ const settingSchema = new Schema<env.Setting>({
     min: 0,
     max: 23,
   },
+  platformCommissionPct: {
+    // Default platform commission (%) applied to host bookings when the
+    // host has no per-host override (host.commissionPct)
+    type: Number,
+    default: 35,
+    min: 0,
+    max: 100,
+  },
 }, {
   timestamps: true,
   strict: true,

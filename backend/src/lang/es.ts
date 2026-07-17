@@ -58,4 +58,14 @@ export const es = {
     + `La reseña está pendiente de moderación y se publicará una vez aprobada.<br>`
     + `Puede ver y responder a esta reseña en su panel de control.<br><br>`
     + `Saludos cordiales,<br>El equipo de BookCars`,
+
+  HOST_APPLICATION_RECEIVED_SUBJECT: 'Solicitud de anfitrión recibida',
+  HOST_APPLICATION_RECEIVED_BODY: 'Gracias por solicitar convertirse en anfitrión. Revisaremos su solicitud y le responderemos en breve.',
+  NEW_HOST_APPLICATION_NOTIFICATION: 'solicitó convertirse en anfitrión',
+  HOST_APPROVED_SUBJECT: 'Su solicitud de anfitrión ha sido aprobada',
+  HOST_APPROVED_BODY: '¡Felicidades! Su solicitud de anfitrión ha sido aprobada. Ya puede publicar sus vehículos.',
+  HOST_REJECTED_SUBJECT: 'Su solicitud de anfitrión ha sido rechazada',
+  HOST_REJECTED_BODY: 'Lamentablemente, su solicitud de anfitrión ha sido rechazada por el siguiente motivo:',
+  HOST_SUSPENDED_SUBJECT: 'Su cuenta de anfitrión ha sido suspendida',
+  HOST_SUSPENDED_BODY: 'Su cuenta de anfitrión ha sido suspendida. Póngase en contacto con nosotros para más información.',
 }

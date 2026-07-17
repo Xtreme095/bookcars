@@ -59,6 +59,7 @@ export const updateSettings = async (req: Request, res: Response) => {
       minRentalHours,
       minPickupDropoffHour,
       maxPickupDropoffHour,
+      platformCommissionPct,
     }: bookcarsTypes.UpdateSettingsPayload = req.body
     const settings = await Setting.findOne({})
 
@@ -67,6 +68,9 @@ export const updateSettings = async (req: Request, res: Response) => {
       settings.minRentalHours = minRentalHours
       settings.minPickupDropoffHour = minPickupDropoffHour
       settings.maxPickupDropoffHour = maxPickupDropoffHour
+      if (platformCommissionPct !== undefined) {
+        settings.platformCommissionPct = platformCommissionPct
+      }
 
       await settings.save()
 

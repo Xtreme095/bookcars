@@ -327,6 +327,25 @@ export const CDN_LICENSES = __env__('BC_CDN_LICENSES', true)
 export const CDN_TEMP_LICENSES = __env__('BC_CDN_TEMP_LICENSES', true)
 
 /**
+ * Host identity documents' folder path (P2P).
+ *
+ * Unlike the other CDN folders, this one must NOT be publicly served:
+ * it holds identity documents, which are streamed to their owner or an
+ * admin through an authenticated endpoint. Default keeps it outside
+ * CDN_ROOT.
+ *
+ * @type {string}
+ */
+export const CDN_HOST_DOCUMENTS = __env__('BC_CDN_HOST_DOCUMENTS', false, '/var/www/private/bookcars/host-documents')
+
+/**
+ * Host identity documents' temp folder path (P2P).
+ *
+ * @type {string}
+ */
+export const CDN_TEMP_HOST_DOCUMENTS = __env__('BC_CDN_TEMP_HOST_DOCUMENTS', false, '/var/www/private/bookcars/temp/host-documents')
+
+/**
  * Admin host.
  *
  * @type {string}
@@ -594,6 +613,42 @@ export interface User extends Document {
   // Verification (for suppliers)
   businessVerified?: boolean
   verificationDocuments?: string[]
+
+  // Host profile (P2P) — present only for users who applied to become a host
+  host?: HostProfile
+}
+
+/**
+ * Host profile subdocument (P2P model).
+ *
+ * A user with a host subdocument applied to become a host. Approved hosts
+ * may list vehicles (Car.supplier points at the host's user id).
+ *
+ * @export
+ * @interface HostProfile
+ * @typedef {HostProfile}
+ */
+export interface HostProfile {
+  status: bookcarsTypes.HostStatus
+  appliedAt?: Date
+  address?: string
+  city?: string
+  postalCode?: string
+  countryCode?: string
+  oib?: string
+  iban?: string
+  swiftBic?: string
+  bankAccountHolder?: string
+  commissionPct?: number
+  guaranteedMonthlyMinimum?: number
+  contractNumber?: string
+  idDocFront?: string
+  idDocBack?: string
+  reviewedBy?: Types.ObjectId
+  reviewedAt?: Date
+  rejectionReason?: string
+  suspendedAt?: Date
+  notes?: string
 }
 
 /**
@@ -1013,6 +1068,7 @@ export interface Setting extends Document {
   minRentalHours: number
   minPickupDropoffHour: number
   maxPickupDropoffHour: number
+  platformCommissionPct: number
 }
 
 /**

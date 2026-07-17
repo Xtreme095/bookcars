@@ -120,6 +120,7 @@ describe('PUT /api/update-settings', () => {
       minRentalHours: 3,
       minPickupDropoffHour: 9,
       maxPickupDropoffHour: 19,
+      platformCommissionPct: 40,
     }
 
     let res = await request(app)
@@ -137,6 +138,7 @@ describe('PUT /api/update-settings', () => {
     expect(_settings!.minRentalHours).toBe(payload.minRentalHours)
     expect(_settings!.minPickupDropoffHour).toBe(payload.minPickupDropoffHour)
     expect(_settings!.maxPickupDropoffHour).toBe(payload.maxPickupDropoffHour)
+    expect(_settings!.platformCommissionPct).toBe(payload.platformCommissionPct)
 
     // test not found
     await Setting.deleteMany({})

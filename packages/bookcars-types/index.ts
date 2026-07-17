@@ -4,6 +4,18 @@ export enum UserType {
   User = 'user',
 }
 
+export enum HostStatus {
+  Pending = 'pending',
+  Approved = 'approved',
+  Rejected = 'rejected',
+  Suspended = 'suspended',
+}
+
+export enum HostDocumentType {
+  IdFront = 'idFront',
+  IdBack = 'idBack',
+}
+
 export enum AppType {
   Admin = 'admin',
   Frontend = 'frontend',
@@ -406,6 +418,56 @@ export interface User {
   priceChangeRate?: number
   supplierCarLimit?: number
   notifyAdminOnNewCar?: boolean
+  host?: HostProfile
+}
+
+export interface HostProfile {
+  status: HostStatus
+  appliedAt?: Date
+  address?: string
+  city?: string
+  postalCode?: string
+  countryCode?: string
+  oib?: string
+  iban?: string
+  swiftBic?: string
+  bankAccountHolder?: string
+  commissionPct?: number
+  guaranteedMonthlyMinimum?: number
+  contractNumber?: string
+  idDocFront?: string
+  idDocBack?: string
+  reviewedBy?: string
+  reviewedAt?: Date
+  rejectionReason?: string
+  suspendedAt?: Date
+  notes?: string
+}
+
+export interface ApplyToHostPayload {
+  address: string
+  city: string
+  postalCode: string
+  countryCode?: string
+  oib: string
+  iban: string
+  swiftBic?: string
+  bankAccountHolder: string
+  idDocFront: string
+  idDocBack: string
+}
+
+export interface ReviewHostPayload {
+  status: HostStatus
+  rejectionReason?: string
+  commissionPct?: number
+  guaranteedMonthlyMinimum?: number
+  contractNumber?: string
+  notes?: string
+}
+
+export interface GetHostsBody {
+  statuses?: HostStatus[]
 }
 
 export interface Option {
@@ -627,6 +689,7 @@ export interface Setting {
   minRentalHours: number
   minPickupDropoffHour: number
   maxPickupDropoffHour: number
+  platformCommissionPct: number
 }
 
 export interface UpdateSettingsPayload {
@@ -634,6 +697,7 @@ export interface UpdateSettingsPayload {
   minRentalHours: number
   minPickupDropoffHour: number
   maxPickupDropoffHour: number
+  platformCommissionPct: number
 }
 
 // 

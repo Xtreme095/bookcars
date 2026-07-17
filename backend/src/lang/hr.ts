@@ -58,4 +58,14 @@ export const hr = {
     + `Recenzija trenutno čeka moderaciju i bit će objavljena nakon odobrenja.<br>`
     + `Možete vidjeti i odgovoriti na ovu recenziju na svojoj nadzornoj ploči.<br><br>`
     + `Srdačan pozdrav,<br>BookCars Tim`,
+
+  HOST_APPLICATION_RECEIVED_SUBJECT: 'Zaprimljena prijava za domaćina',
+  HOST_APPLICATION_RECEIVED_BODY: 'Hvala vam na prijavi za domaćina. Pregledat ćemo vašu prijavu i javiti vam se uskoro.',
+  NEW_HOST_APPLICATION_NOTIFICATION: 'poslao/la je prijavu za domaćina',
+  HOST_APPROVED_SUBJECT: 'Vaša prijava za domaćina je odobrena',
+  HOST_APPROVED_BODY: 'Čestitamo! Vaša prijava za domaćina je odobrena. Sada možete objaviti svoja vozila.',
+  HOST_REJECTED_SUBJECT: 'Vaša prijava za domaćina je odbijena',
+  HOST_REJECTED_BODY: 'Nažalost, vaša prijava za domaćina je odbijena iz sljedećeg razloga:',
+  HOST_SUSPENDED_SUBJECT: 'Vaš račun domaćina je suspendiran',
+  HOST_SUSPENDED_BODY: 'Vaš račun domaćina je suspendiran. Molimo kontaktirajte nas za više informacija.',
 }

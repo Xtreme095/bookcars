@@ -58,4 +58,14 @@ export const en = {
     + `The review is currently pending moderation and will be published once approved.<br>`
     + `You can view and respond to this review in your dashboard.<br><br>`
     + `Best regards,<br>The BookCars Team`,
+
+  HOST_APPLICATION_RECEIVED_SUBJECT: 'Host application received',
+  HOST_APPLICATION_RECEIVED_BODY: 'Thank you for applying to become a host. We will review your application and get back to you shortly.',
+  NEW_HOST_APPLICATION_NOTIFICATION: 'applied to become a host',
+  HOST_APPROVED_SUBJECT: 'Your host application has been approved',
+  HOST_APPROVED_BODY: 'Congratulations! Your host application has been approved. You can now list your vehicles.',
+  HOST_REJECTED_SUBJECT: 'Your host application has been rejected',
+  HOST_REJECTED_BODY: 'Unfortunately, your host application has been rejected for the following reason:',
+  HOST_SUSPENDED_SUBJECT: 'Your host account has been suspended',
+  HOST_SUSPENDED_BODY: 'Your host account has been suspended. Please contact us for more information.',
 }

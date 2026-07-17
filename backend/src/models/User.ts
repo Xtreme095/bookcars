@@ -252,6 +252,122 @@ const userSchema = new Schema<env.User>(
     verificationDocuments: [{
       type: String,
     }],
+
+    // Host profile (P2P) — present only for users who applied to become a host
+    host: {
+      type: new Schema<env.HostProfile>(
+        {
+          status: {
+            type: String,
+            enum: [
+              bookcarsTypes.HostStatus.Pending,
+              bookcarsTypes.HostStatus.Approved,
+              bookcarsTypes.HostStatus.Rejected,
+              bookcarsTypes.HostStatus.Suspended,
+            ],
+            required: [true, "can't be blank"],
+          },
+          appliedAt: {
+            type: Date,
+          },
+          address: {
+            type: String,
+            trim: true,
+          },
+          city: {
+            type: String,
+            trim: true,
+          },
+          postalCode: {
+            type: String,
+            trim: true,
+          },
+          countryCode: {
+            // ISO 3166-1 alpha-2 code
+            type: String,
+            default: 'HR',
+            uppercase: true,
+            minlength: 2,
+            maxlength: 2,
+          },
+          oib: {
+            type: String,
+            trim: true,
+            validate: {
+              validator: (value: string) => {
+                if (!value) {
+                  return true
+                }
+                return /^\d{11}$/.test(value)
+              },
+              message: 'OIB must be exactly 11 digits',
+            },
+          },
+          iban: {
+            type: String,
+            trim: true,
+            uppercase: true,
+            validate: {
+              validator: (value: string) => {
+                if (!value) {
+                  return true
+                }
+                return validator.isIBAN(value)
+              },
+              message: '{VALUE} is not a valid IBAN',
+            },
+          },
+          swiftBic: {
+            type: String,
+            trim: true,
+            uppercase: true,
+          },
+          bankAccountHolder: {
+            type: String,
+            trim: true,
+          },
+          commissionPct: {
+            // per-host override; unset means Setting.platformCommissionPct applies
+            type: Number,
+            min: 0,
+            max: 100,
+          },
+          guaranteedMonthlyMinimum: {
+            type: Number,
+            min: 0,
+          },
+          contractNumber: {
+            type: String,
+            trim: true,
+          },
+          idDocFront: {
+            type: String,
+          },
+          idDocBack: {
+            type: String,
+          },
+          reviewedBy: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+          },
+          reviewedAt: {
+            type: Date,
+          },
+          rejectionReason: {
+            type: String,
+            trim: true,
+          },
+          suspendedAt: {
+            type: Date,
+          },
+          notes: {
+            type: String,
+            trim: true,
+          },
+        },
+        { _id: false },
+      ),
+    },
   },
   {
     timestamps: true,
@@ -261,6 +377,7 @@ const userSchema = new Schema<env.User>(
 )
 
 // Add custom indexes
+userSchema.index({ 'host.status': 1 })
 userSchema.index({ type: 1, expireAt: 1, fullName: 1 })
 userSchema.index({ type: 1, expireAt: 1, email: 1 })
 userSchema.index({ type: 1, expireAt: 1, fullName: 1, _id: 1 })

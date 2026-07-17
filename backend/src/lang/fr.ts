@@ -58,4 +58,14 @@ export const fr = {
     + `L'avis est actuellement en attente de modération et sera publié une fois approuvé.<br>`
     + `Vous pouvez consulter et répondre à cet avis dans votre tableau de bord.<br><br>`
     + `Cordialement,<br>L'équipe BookCars`,
+
+  HOST_APPLICATION_RECEIVED_SUBJECT: 'Candidature d\'hôte reçue',
+  HOST_APPLICATION_RECEIVED_BODY: 'Merci d\'avoir postulé pour devenir hôte. Nous examinerons votre candidature et vous répondrons rapidement.',
+  NEW_HOST_APPLICATION_NOTIFICATION: 'a postulé pour devenir hôte',
+  HOST_APPROVED_SUBJECT: 'Votre candidature d\'hôte a été approuvée',
+  HOST_APPROVED_BODY: 'Félicitations ! Votre candidature d\'hôte a été approuvée. Vous pouvez désormais proposer vos véhicules.',
+  HOST_REJECTED_SUBJECT: 'Votre candidature d\'hôte a été refusée',
+  HOST_REJECTED_BODY: 'Malheureusement, votre candidature d\'hôte a été refusée pour la raison suivante :',
+  HOST_SUSPENDED_SUBJECT: 'Votre compte d\'hôte a été suspendu',
+  HOST_SUSPENDED_BODY: 'Votre compte d\'hôte a été suspendu. Veuillez nous contacter pour plus d\'informations.',
 }
