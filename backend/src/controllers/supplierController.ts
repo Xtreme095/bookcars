@@ -44,8 +44,8 @@ export const validate = async (req: Request, res: Response) => {
       res.sendStatus(200)
     }
   } catch (err) {
-    logger.error(`[supplier.validate] ${i18n.t('DB_ERROR')} ${fullName}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[supplier.validate] ${i18n.t('ERROR')} ${fullName}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -66,6 +66,17 @@ export const update = async (req: Request, res: Response) => {
     if (!helper.isValidObjectId(_id)) {
       throw new Error('body._id is not valid')
     }
+
+    // begin of security check
+    const sessionUserId = req.user?._id
+    const sessionUser = await User.findById(sessionUserId)
+    if (!sessionUser || sessionUser.type === bookcarsTypes.UserType.User || (sessionUser.type === bookcarsTypes.UserType.Supplier && sessionUserId !== _id)) {
+      logger.error(`[supplier.update] Unauthorized attempt to update supplier ${_id} by user ${sessionUserId}`)
+      res.status(403).send('Forbidden: You cannot update supplier information')
+      return
+    }
+    // end of security check
+
     const supplier = await User.findById(_id)
 
     if (supplier) {
@@ -116,8 +127,8 @@ export const update = async (req: Request, res: Response) => {
     logger.error('[supplier.update] Supplier not found:', _id)
     res.sendStatus(204)
   } catch (err) {
-    logger.error(`[supplier.update] ${i18n.t('DB_ERROR')} ${_id}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[supplier.update] ${i18n.t('ERROR')} ${_id}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -134,6 +145,16 @@ export const deleteSupplier = async (req: Request, res: Response) => {
   const { id } = req.params
 
   try {
+    // begin of security check
+    const sessionUserId = req.user?._id
+    const sessionUser = await User.findById(sessionUserId)
+    if (!sessionUser || sessionUser.type != bookcarsTypes.UserType.Admin) {
+      logger.error(`[supplier.delete] Unauthorized attempt to delete supplier ${id} by user ${sessionUserId}`)
+      res.status(403).send('Forbidden: You cannot delete supplier')
+      return
+    }
+    // end of security check
+
     const supplier = await User.findById(id)
     if (supplier) {
       await User.deleteOne({ _id: id })
@@ -188,8 +209,8 @@ export const deleteSupplier = async (req: Request, res: Response) => {
     }
     res.sendStatus(200)
   } catch (err) {
-    logger.error(`[supplier.delete] ${i18n.t('DB_ERROR')} ${id}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[supplier.delete] ${i18n.t('ERROR')} ${id}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -249,8 +270,8 @@ export const getSupplier = async (req: Request, res: Response) => {
       blacklisted,
     })
   } catch (err) {
-    logger.error(`[supplier.getSupplier] ${i18n.t('DB_ERROR')} ${id}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[supplier.getSupplier] ${i18n.t('ERROR')} ${id}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -323,8 +344,8 @@ export const getSuppliers = async (req: Request, res: Response) => {
 
     res.json(data)
   } catch (err) {
-    logger.error(`[supplier.getSuppliers] ${i18n.t('DB_ERROR')} ${req.query.s}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[supplier.getSuppliers] ${i18n.t('ERROR')} ${req.query.s}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -354,8 +375,8 @@ export const getAllSuppliers = async (req: Request, res: Response) => {
 
     res.json(data)
   } catch (err) {
-    logger.error(`[supplier.getAllSuppliers] ${i18n.t('DB_ERROR')}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[supplier.getAllSuppliers] ${i18n.t('ERROR')}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -611,8 +632,8 @@ export const getFrontendSuppliers = async (req: Request, res: Response) => {
     )
     res.json(data)
   } catch (err) {
-    logger.error(`[supplier.getFrontendSuppliers] ${i18n.t('DB_ERROR')}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[supplier.getFrontendSuppliers] ${i18n.t('ERROR')}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -753,8 +774,8 @@ export const getAdminSuppliers = async (req: Request, res: Response) => {
 
     res.json(data)
   } catch (err) {
-    logger.error(`[supplier.getAdminSuppliers] ${i18n.t('DB_ERROR')}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[supplier.getAdminSuppliers] ${i18n.t('ERROR')}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -784,10 +805,17 @@ export const createContract = async (req: Request, res: Response) => {
     const filename = `${nanoid()}_${language}${path.extname(req.file.originalname)}`
     const filepath = path.join(env.CDN_TEMP_CONTRACTS, filename)
 
+    // security check: restrict allowed extensions
+    const ext = path.extname(filename)
+    if (!env.allowedContractExtensions.includes(ext.toLowerCase())) {
+      res.status(400).send('Invalid contract file type')
+      return
+    }
+
     await asyncFs.writeFile(filepath, req.file.buffer)
     res.json(filename)
   } catch (err) {
-    logger.error(`[supplier.createContract] ${i18n.t('DB_ERROR')}`, err)
+    logger.error(`[supplier.createContract] ${i18n.t('ERROR')}`, err)
     res.status(400).send(i18n.t('ERROR') + err)
   }
 }
@@ -833,6 +861,13 @@ export const updateContract = async (req: Request, res: Response) => {
       const filename = `${supplier._id}_${language}${path.extname(file.originalname)}`
       const filepath = path.join(env.CDN_CONTRACTS, filename)
 
+      // security check: restrict allowed extensions
+      const ext = path.extname(filename)
+      if (!env.allowedContractExtensions.includes(ext.toLowerCase())) {
+        res.status(400).send('Invalid contract file type')
+        return
+      }
+
       await asyncFs.writeFile(filepath, file.buffer)
       if (!contract) {
         supplier.contracts?.push({ language, file: filename })
@@ -846,8 +881,8 @@ export const updateContract = async (req: Request, res: Response) => {
 
     res.sendStatus(204)
   } catch (err) {
-    logger.error(`[supplier.updateContract] ${i18n.t('DB_ERROR')} ${id}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[supplier.updateContract] ${i18n.t('ERROR')} ${id}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -888,8 +923,8 @@ export const deleteContract = async (req: Request, res: Response) => {
     }
     res.sendStatus(204)
   } catch (err) {
-    logger.error(`[supplier.deleteContract] ${i18n.t('DB_ERROR')} ${id}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[supplier.deleteContract] ${i18n.t('ERROR')} ${id}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -906,17 +941,29 @@ export const deleteTempContract = async (req: Request, res: Response) => {
   const { file } = req.params
 
   try {
-    if (!file.includes('.')) {
-      throw new Error('Filename not valid')
+    // prevent null bytes
+    if (file.includes('\0')) {
+      res.status(400).send('Invalid filename')
+      return
     }
-    const contractFile = path.join(env.CDN_TEMP_CONTRACTS, file)
-    if (await helper.pathExists(contractFile)) {
-      await asyncFs.unlink(contractFile)
+
+    const baseDir = path.resolve(env.CDN_TEMP_CONTRACTS)
+    const targetPath = path.resolve(baseDir, file)
+
+    // critical security check: prevent directory traversal
+    if (!targetPath.startsWith(baseDir + path.sep)) {
+      logger.warn(`Directory traversal attempt: ${file}`)
+      res.status(403).send('Forbidden')
+      return
+    }
+
+    if (await helper.pathExists(targetPath)) {
+      await asyncFs.unlink(targetPath)
     }
 
     res.sendStatus(200)
   } catch (err) {
-    logger.error(`[supplier.deleteTempContract] ${i18n.t('DB_ERROR')} ${file}`, err)
+    logger.error(`[supplier.deleteTempContract] ${i18n.t('ERROR')} ${file}`, err)
     res.status(400).send(i18n.t('ERROR') + err)
   }
 }

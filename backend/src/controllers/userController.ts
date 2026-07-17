@@ -64,20 +64,64 @@ const _signup = async (req: Request, res: Response, userType: bookcarsTypes.User
     user = new User(body)
     await user.save()
 
+    // avatar
     if (body.avatar) {
-      const avatar = path.join(env.CDN_TEMP_USERS, body.avatar)
-      if (await helper.pathExists(avatar)) {
-        const filename = `${user._id}_${Date.now()}${path.extname(body.avatar)}`
-        const newPath = path.join(env.CDN_USERS, filename)
+      // -----------------------------
+      // 1️. Sanitize filename
+      // -----------------------------
+      const safeAvatar = path.basename(body.avatar)
 
-        await asyncFs.rename(avatar, newPath)
+      // If basename changed it, it's a traversal attempt
+      if (safeAvatar !== body.avatar) {
+        logger.warn(`[user.signup] Directory traversal attempt (avatar): ${body.avatar}`)
+        res.status(400).send('Invalid avatar filename')
+        return
+      }
+
+      const tempDir = path.resolve(env.CDN_TEMP_USERS)
+      const usersDir = path.resolve(env.CDN_USERS)
+
+      const avatarPath = path.resolve(tempDir, safeAvatar)
+
+      // -----------------------------
+      // 2️. Ensure source is inside temp directory
+      // -----------------------------
+      if (!avatarPath.startsWith(tempDir + path.sep)) {
+        logger.warn(`[user.signup] Avatar source path escape attempt: ${avatarPath}`)
+        res.status(400).send('Invalid avatar path')
+        return
+      }
+
+      if (await helper.pathExists(avatarPath)) {
+        const ext = path.extname(safeAvatar)
+
+        // security check: restrict allowed extensions
+        if (!env.allowedImageExtensions.includes(ext.toLowerCase())) {
+          res.status(400).send('Invalid avatar file type')
+          return
+        }
+
+        const filename = `${user._id}_${Date.now()}${ext}`
+        const newPath = path.resolve(usersDir, filename)
+
+        // -----------------------------
+        // 3. Ensure destination is inside users directory
+        // -----------------------------
+        if (!newPath.startsWith(usersDir + path.sep)) {
+          logger.warn(`[user.signup] Avatar destination path escape attempt: ${newPath}`)
+          res.status(400).send('Invalid avatar destination')
+          return
+        }
+
+        await asyncFs.rename(avatarPath, newPath)
+
         user.avatar = filename
         await user.save()
       }
     }
   } catch (err) {
-    logger.error(`[user.signup] ${i18n.t('DB_ERROR')} ${JSON.stringify(body)}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[user.signup] ${i18n.t('ERROR')} ${JSON.stringify(body)}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
     return
   }
 
@@ -119,7 +163,7 @@ const _signup = async (req: Request, res: Response, userType: bookcarsTypes.User
       await Token.deleteMany({ user: user._id.toString() })
       await user.deleteOne()
     } catch (deleteErr) {
-      logger.error(`[user.signup] ${i18n.t('DB_ERROR')} ${JSON.stringify(body)}`, deleteErr)
+      logger.error(`[user.signup] ${i18n.t('ERROR')} ${JSON.stringify(body)}`, deleteErr)
     }
     logger.error(`[user.signup] ${i18n.t('SMTP_ERROR')}`, err)
     res.status(400).send(i18n.t('SMTP_ERROR') + err)
@@ -163,6 +207,16 @@ export const create = async (req: Request, res: Response) => {
   const { body }: { body: bookcarsTypes.CreateUserPayload } = req
 
   try {
+    // begin of security check
+    const sessionUserId = req.user?._id
+    const sessionUser = await User.findById(sessionUserId)
+    if (!sessionUser || sessionUser.type === bookcarsTypes.UserType.User) {
+      logger.error(`[user.create] Unauthorized attempt to create user by user ${sessionUserId}`)
+      res.status(403).send('Forbidden: You cannot create user')
+      return
+    }
+    // end of security check
+
     body.verified = false
     body.blacklisted = false
 
@@ -178,33 +232,130 @@ export const create = async (req: Request, res: Response) => {
     const user = new User(body)
     await user.save()
 
+    // contracts
     const finalContracts: bookcarsTypes.Contract[] = []
     if (contracts) {
       for (const contract of contracts) {
-        if (contract.language && contract.file) {
-          const tempFile = path.join(env.CDN_TEMP_CONTRACTS, contract.file)
+        if (!contract.language || !contract.file) {
+          continue
+        }
 
-          if (await helper.pathExists(tempFile)) {
-            const filename = `${user._id.toString()}_${contract.language}${path.extname(tempFile)}`
-            const newPath = path.join(env.CDN_CONTRACTS, filename)
+        // -----------------------------
+        // 1. Validate language (ISO 639-1)
+        // -----------------------------
+        const language = contract.language.toLowerCase().trim()
 
-            await asyncFs.rename(tempFile, newPath)
-            finalContracts.push({ language: contract.language, file: filename })
+        // Exactly 2 letters, a–z only
+        if (!helper.validateLanguage(language)) {
+          logger.warn(`[contract] Invalid ISO 639-1 language: ${contract.language}`)
+          continue
+        }
+
+        // -----------------------------
+        // 2. Sanitize filename (prevent traversal)
+        // -----------------------------
+        const safeFile = path.basename(contract.file)
+
+        // If basename changed it, it's a traversal attempt
+        if (safeFile !== contract.file) {
+          logger.warn(`[contract] Directory traversal attempt (file): ${contract.file}`)
+          continue
+        }
+
+        // security check: restrict allowed extensions
+        const ext = path.extname(safeFile)
+        if (!env.allowedContractExtensions.includes(ext.toLowerCase())) {
+          res.status(400).send('Invalid contract file type')
+          return
+        }
+
+        const tempDir = path.resolve(env.CDN_TEMP_CONTRACTS)
+        const contractsDir = path.resolve(env.CDN_CONTRACTS)
+
+        const tempFile = path.resolve(tempDir, safeFile)
+
+        // Ensure source stays inside temp directory
+        if (!tempFile.startsWith(tempDir + path.sep)) {
+          logger.warn(`[contract] Source path escape attempt: ${tempFile}`)
+          continue
+        }
+
+        if (await helper.pathExists(tempFile)) {
+          const ext = path.extname(safeFile)
+
+          const filename = `${user._id.toString()}_${language}${ext}`
+          const newPath = path.resolve(contractsDir, filename)
+
+          // Ensure destination stays inside contracts directory
+          if (!newPath.startsWith(contractsDir + path.sep)) {
+            logger.warn(`[contract] Destination path escape attempt: ${newPath}`)
+            continue
           }
+
+          await asyncFs.rename(tempFile, newPath)
+
+          finalContracts.push({
+            language,
+            file: filename
+          })
         }
       }
+
       user.contracts = finalContracts
       await user.save()
     }
 
     // avatar
     if (body.avatar) {
-      const avatar = path.join(env.CDN_TEMP_USERS, body.avatar)
-      if (await helper.pathExists(avatar)) {
-        const filename = `${user._id}_${Date.now()}${path.extname(body.avatar)}`
-        const newPath = path.join(env.CDN_USERS, filename)
+      // -----------------------------
+      // 1️. Sanitize filename
+      // -----------------------------
+      const safeAvatar = path.basename(body.avatar)
 
-        await asyncFs.rename(avatar, newPath)
+      // If basename changed it, it's a traversal attempt
+      if (safeAvatar !== body.avatar) {
+        logger.warn(`[user.create] Directory traversal attempt (avatar): ${body.avatar}`)
+        res.status(400).send('Invalid avatar filename')
+        return
+      }
+
+      const tempDir = path.resolve(env.CDN_TEMP_USERS)
+      const usersDir = path.resolve(env.CDN_USERS)
+
+      const avatarPath = path.resolve(tempDir, safeAvatar)
+
+      // -----------------------------
+      // 2️. Ensure source is inside temp directory
+      // -----------------------------
+      if (!avatarPath.startsWith(tempDir + path.sep)) {
+        logger.warn(`[user.create] Avatar source path escape attempt: ${avatarPath}`)
+        res.status(400).send('Invalid avatar path')
+        return
+      }
+
+      if (await helper.pathExists(avatarPath)) {
+        const ext = path.extname(safeAvatar)
+
+        // security check: restrict allowed extensions
+        if (!env.allowedImageExtensions.includes(ext.toLowerCase())) {
+          res.status(400).send('Invalid avatar file type')
+          return
+        }
+
+        const filename = `${user._id}_${Date.now()}${ext}`
+        const newPath = path.resolve(usersDir, filename)
+
+        // -----------------------------
+        // 3. Ensure destination is inside users directory
+        // -----------------------------
+        if (!newPath.startsWith(usersDir + path.sep)) {
+          logger.warn(`[user.create] Avatar destination path escape attempt: ${newPath}`)
+          res.status(400).send('Invalid avatar destination')
+          return
+        }
+
+        await asyncFs.rename(avatarPath, newPath)
+
         user.avatar = filename
         await user.save()
       }
@@ -212,12 +363,54 @@ export const create = async (req: Request, res: Response) => {
 
     // license
     if (body.license && user.type === bookcarsTypes.UserType.User) {
-      const license = path.join(env.CDN_TEMP_LICENSES, body.license)
-      if (await helper.pathExists(license)) {
-        const filename = `${user._id}${path.extname(body.license)}`
-        const newPath = path.join(env.CDN_LICENSES, filename)
+      // -----------------------------
+      // 1. Sanitize filename
+      // -----------------------------
+      const safeLicense = path.basename(body.license)
 
-        await asyncFs.rename(license, newPath)
+      // If basename changed it, it's a traversal attempt
+      if (safeLicense !== body.license) {
+        logger.warn(`[user.create] Directory traversal attempt (license): ${body.license}`)
+        res.status(400).send('Invalid license filename')
+        return
+      }
+
+      const tempDir = path.resolve(env.CDN_TEMP_LICENSES)
+      const licensesDir = path.resolve(env.CDN_LICENSES)
+
+      const licensePath = path.resolve(tempDir, safeLicense)
+
+      // -----------------------------
+      // 2. Ensure source stays inside temp directory
+      // -----------------------------
+      if (!licensePath.startsWith(tempDir + path.sep)) {
+        logger.warn(`[user.create] License source path escape attempt: ${licensePath}`)
+        res.status(400).send('Invalid license path')
+        return
+      }
+
+      if (await helper.pathExists(licensePath)) {
+        // security check: restrict allowed extensions
+        const ext = path.extname(safeLicense)
+        if (!env.allowedLicenseExtensions.includes(ext.toLowerCase())) {
+          res.status(400).send('Invalid license file type')
+          return
+        }
+
+        const filename = `${user._id}${ext}`
+        const newPath = path.resolve(licensesDir, filename)
+
+        // -----------------------------
+        // 3. Ensure destination stays inside licenses directory
+        // -----------------------------
+        if (!newPath.startsWith(licensesDir + path.sep)) {
+          logger.warn(`[user.create] License destination path escape attempt: ${newPath}`)
+          res.status(400).send('Invalid license destination')
+          return
+        }
+
+        await asyncFs.rename(licensePath, newPath)
+
         user.license = filename
         await user.save()
       }
@@ -254,8 +447,8 @@ export const create = async (req: Request, res: Response) => {
     await mailHelper.sendMail(mailOptions)
     res.sendStatus(200)
   } catch (err) {
-    logger.error(`[user.create] ${i18n.t('DB_ERROR')} ${JSON.stringify(body)}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[user.create] ${i18n.t('ERROR')} ${JSON.stringify(body)}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -306,8 +499,8 @@ export const checkToken = async (req: Request, res: Response) => {
 
     res.sendStatus(204)
   } catch (err) {
-    logger.error(`[user.checkToken] ${i18n.t('DB_ERROR')} ${JSON.stringify(req.params)}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[user.checkToken] ${i18n.t('ERROR')} ${JSON.stringify(req.params)}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -335,8 +528,8 @@ export const deleteTokens = async (req: Request, res: Response) => {
 
     res.sendStatus(400)
   } catch (err) {
-    logger.error(`[user.deleteTokens] ${i18n.t('DB_ERROR')} ${userId}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[user.deleteTokens] ${i18n.t('ERROR')} ${userId}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -407,8 +600,8 @@ export const resend = async (req: Request, res: Response) => {
 
     res.sendStatus(204)
   } catch (err) {
-    logger.error(`[user.resend] ${i18n.t('DB_ERROR')} ${email}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[user.resend] ${i18n.t('ERROR')} ${email}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -452,8 +645,8 @@ export const activate = async (req: Request, res: Response) => {
 
     res.sendStatus(204)
   } catch (err) {
-    logger.error(`[user.activate] ${i18n.t('DB_ERROR')} ${userId}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[user.activate] ${i18n.t('ERROR')} ${userId}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -560,8 +753,8 @@ export const signin = async (req: Request, res: Response) => {
 
     res.sendStatus(204)
   } catch (err) {
-    logger.error(`[user.signin] ${i18n.t('DB_ERROR')} ${emailFromBody}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[user.signin] ${i18n.t('ERROR')} ${emailFromBody}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -593,14 +786,12 @@ export const socialSignin = async (req: Request, res: Response) => {
       throw new Error('body.email is not valid')
     }
 
-    if (!mobile) {
-      if (!accessToken) {
-        throw new Error('body.accessToken not found')
-      }
+    if (!accessToken) {
+      throw new Error('body.accessToken not found')
+    }
 
-      if (!(await authHelper.validateAccessToken(socialSignInType, accessToken, email))) {
-        throw new Error('body.accessToken is not valid')
-      }
+    if (!(await authHelper.validateAccessToken(socialSignInType, accessToken, email))) {
+      throw new Error('body.accessToken is not valid')
     }
 
     let user = await User.findOne({ email })
@@ -678,8 +869,8 @@ export const socialSignin = async (req: Request, res: Response) => {
       .status(200)
       .send(loggedUser)
   } catch (err) {
-    logger.error(`[user.socialSignin] ${i18n.t('DB_ERROR')} ${emailFromBody}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[user.socialSignin] ${i18n.t('ERROR')} ${emailFromBody}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -725,7 +916,7 @@ export const getPushToken = async (req: Request, res: Response) => {
 
     res.sendStatus(204)
   } catch (err) {
-    logger.error(`[user.pushToken] ${i18n.t('DB_ERROR')} ${userId}`, err)
+    logger.error(`[user.pushToken] ${i18n.t('ERROR')} ${userId}`, err)
     res.status(400).send(i18n.t('ERROR') + err)
   }
 }
@@ -761,7 +952,7 @@ export const createPushToken = async (req: Request, res: Response) => {
 
     res.status(400).send('Push Token already exists.')
   } catch (err) {
-    logger.error(`[user.createPushToken] ${i18n.t('DB_ERROR')} ${userId}`, err)
+    logger.error(`[user.createPushToken] ${i18n.t('ERROR')} ${userId}`, err)
     res.status(400).send(i18n.t('ERROR') + err)
   }
 }
@@ -786,7 +977,7 @@ export const deletePushToken = async (req: Request, res: Response) => {
     await PushToken.deleteMany({ user: userId })
     res.sendStatus(200)
   } catch (err) {
-    logger.error(`[user.deletePushToken] ${i18n.t('DB_ERROR')} ${userId}`, err)
+    logger.error(`[user.deletePushToken] ${i18n.t('ERROR')} ${userId}`, err)
     res.status(400).send(i18n.t('ERROR') + err)
   }
 }
@@ -829,8 +1020,8 @@ export const validateEmail = async (req: Request, res: Response) => {
     // email does not exist in db (can be added)
     res.sendStatus(200)
   } catch (err) {
-    logger.error(`[user.validateEmail] ${i18n.t('DB_ERROR')} ${email}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[user.validateEmail] ${i18n.t('ERROR')} ${email}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -895,8 +1086,8 @@ export const confirmEmail = async (req: Request, res: Response) => {
     await user.save()
     res.status(200).send(getStatusMessage(user.language, i18n.t('ACCOUNT_ACTIVATION_SUCCESS')))
   } catch (err) {
-    logger.error(`[user.confirmEmail] ${i18n.t('DB_ERROR')} ${JSON.stringify(req.params)}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[user.confirmEmail] ${i18n.t('ERROR')} ${JSON.stringify(req.params)}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -962,8 +1153,8 @@ export const resendLink = async (req: Request, res: Response) => {
       .status(200)
       .send(getStatusMessage(user.language, i18n.t('ACCOUNT_ACTIVATION_EMAIL_SENT_PART_1') + user.email + i18n.t('ACCOUNT_ACTIVATION_EMAIL_SENT_PART_2')))
   } catch (err) {
-    logger.error(`[user.resendLink] ${i18n.t('DB_ERROR')} ${email}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[user.resendLink] ${i18n.t('ERROR')} ${email}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -992,6 +1183,21 @@ export const update = async (req: Request, res: Response) => {
       res.sendStatus(204)
       return
     }
+
+    // begin of security check
+    const sessionUserId = req.user?._id
+    const sessionUser = await User.findById(sessionUserId)
+    if (!sessionUser
+      || (sessionUser.type === bookcarsTypes.UserType.User && sessionUserId !== user._id.toString())
+      || (sessionUser.type === bookcarsTypes.UserType.Supplier
+        && ((user.type === bookcarsTypes.UserType.User && sessionUserId !== user.supplier?.toString())
+          || (user.type === bookcarsTypes.UserType.Supplier && sessionUserId !== user._id.toString())))
+    ) {
+      logger.error(`[user.update] Unauthorized attempt to update user ${_id} by user ${sessionUserId}`)
+      res.status(403).send('Forbidden: You cannot update user information')
+      return
+    }
+    // end of security check
 
     const {
       fullName,
@@ -1022,7 +1228,8 @@ export const update = async (req: Request, res: Response) => {
     user.supplierCarLimit = supplierCarLimit
     user.notifyAdminOnNewCar = notifyAdminOnNewCar
     user.blacklisted = !!blacklisted
-    if (type) {
+    // only admins can update user type
+    if (type && sessionUser.type === bookcarsTypes.UserType.Admin) {
       user.type = type as bookcarsTypes.UserType
     }
     if (typeof enableEmailNotifications !== 'undefined') {
@@ -1038,8 +1245,8 @@ export const update = async (req: Request, res: Response) => {
     await user.save()
     res.sendStatus(200)
   } catch (err) {
-    logger.error(`[user.update] ${i18n.t('DB_ERROR')} ${JSON.stringify(req.body)}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[user.update] ${i18n.t('ERROR')} ${JSON.stringify(req.body)}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -1076,8 +1283,8 @@ export const updateEmailNotifications = async (req: Request, res: Response) => {
 
     res.sendStatus(200)
   } catch (err) {
-    logger.error(`[user.updateEmailNotifications] ${i18n.t('DB_ERROR')} ${JSON.stringify(body)}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[user.updateEmailNotifications] ${i18n.t('ERROR')} ${JSON.stringify(body)}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -1106,12 +1313,42 @@ export const updateLanguage = async (req: Request, res: Response) => {
       return
     }
 
+    // begin of security check
+    const sessionUserId = req.user?._id
+    const sessionUser = await User.findById(sessionUserId)
+    if (!sessionUser) {
+      logger.error(`[user.updateLanguage] Invalid session user: ${sessionUserId}`)
+      res.status(403).send('Forbidden: Invalid session')
+      return
+    }
+    // users can only update their own language
+    if (
+      sessionUser.type === bookcarsTypes.UserType.User && sessionUserId !== user._id.toString()
+    ) {
+      logger.error(`[user.updateLanguage] User ${sessionUserId} tried to update another user's language`)
+      res.status(403).send('Forbidden: You cannot update another user')
+      return
+    }
+    // suppliers can only update their own language
+    if (
+      sessionUser.type === bookcarsTypes.UserType.Supplier && sessionUserId !== user._id.toString()
+    ) {
+      logger.error(`[user.updateLanguage] Supplier ${sessionUserId} tried to update another user's language`)
+      res.status(403).send('Forbidden: You cannot update another user')
+      return
+    }
+    // end of security check
+
+    if (!helper.validateLanguage(language)) {
+      throw new Error('Invalid language code')
+    }
+
     user.language = language
     await user.save()
     res.sendStatus(200)
   } catch (err) {
-    logger.error(`[user.updateLanguage] ${i18n.t('DB_ERROR')} ${JSON.stringify(req.body)}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[user.updateLanguage] ${i18n.t('ERROR')} ${JSON.stringify(req.body)}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -1163,8 +1400,8 @@ export const getUser = async (req: Request, res: Response) => {
 
     res.json(user)
   } catch (err) {
-    logger.error(`[user.getUser] ${i18n.t('DB_ERROR')} ${id}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[user.getUser] ${i18n.t('ERROR')} ${id}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -1186,10 +1423,17 @@ export const createAvatar = async (req: Request, res: Response) => {
     const filename = `${helper.getFilenameWithoutExtension(req.file.originalname)}_${nanoid()}_${Date.now()}${path.extname(req.file.originalname)}`
     const filepath = path.join(env.CDN_TEMP_USERS, filename)
 
+    // security check: restrict allowed extensions
+    const ext = path.extname(filename)
+    if (!env.allowedImageExtensions.includes(ext.toLowerCase())) {
+      res.status(400).send('Invalid avatar file type')
+      return
+    }
+
     await asyncFs.writeFile(filepath, req.file.buffer)
     res.json(filename)
   } catch (err) {
-    logger.error(`[user.createAvatar] ${i18n.t('DB_ERROR')}`, err)
+    logger.error(`[user.createAvatar] ${i18n.t('ERROR')}`, err)
     res.status(400).send(i18n.t('ERROR') + err)
   }
 }
@@ -1209,7 +1453,7 @@ export const updateAvatar = async (req: Request, res: Response) => {
   try {
     if (!req.file) {
       const msg = 'req.file not found'
-      logger.error(`[user.createAvatar] ${msg}`)
+      logger.error(`[user.updateAvatar] ${msg}`)
       res.status(400).send(msg)
       return
     }
@@ -1228,6 +1472,13 @@ export const updateAvatar = async (req: Request, res: Response) => {
       const filename = `${user._id}_${Date.now()}${path.extname(req.file.originalname)}`
       const filepath = path.join(env.CDN_USERS, filename)
 
+      // security check: restrict allowed extensions
+      const ext = path.extname(filename)
+      if (!env.allowedImageExtensions.includes(ext.toLowerCase())) {
+        res.status(400).send('Invalid avatar file type')
+        return
+      }
+
       await asyncFs.writeFile(filepath, req.file.buffer)
       user.avatar = filename
       await user.save()
@@ -1238,7 +1489,7 @@ export const updateAvatar = async (req: Request, res: Response) => {
     logger.error('[user.updateAvatar] User not found:', userId)
     res.sendStatus(204)
   } catch (err) {
-    logger.error(`[user.updateAvatar] ${i18n.t('DB_ERROR')} ${userId}`, err)
+    logger.error(`[user.updateAvatar] ${i18n.t('ERROR')} ${userId}`, err)
     res.status(400).send(i18n.t('ERROR') + err)
   }
 }
@@ -1275,7 +1526,7 @@ export const deleteAvatar = async (req: Request, res: Response) => {
     logger.error('[user.deleteAvatar] User not found:', userId)
     res.sendStatus(204)
   } catch (err) {
-    logger.error(`[user.deleteAvatar] ${i18n.t('DB_ERROR')} ${userId}`, err)
+    logger.error(`[user.deleteAvatar] ${i18n.t('ERROR')} ${userId}`, err)
     res.status(400).send(i18n.t('ERROR') + err)
   }
 }
@@ -1293,16 +1544,31 @@ export const deleteTempAvatar = async (req: Request, res: Response) => {
   const { avatar } = req.params
 
   try {
-    const avatarFile = path.join(env.CDN_TEMP_USERS, avatar)
-    if (!(await helper.pathExists(avatarFile))) {
-      throw new Error(`[user.deleteTempAvatar] temp avatar ${avatarFile} not found`)
+    // prevent null bytes
+    if (avatar.includes('\0')) {
+      res.status(400).send('Invalid filename')
+      return
     }
 
-    await asyncFs.unlink(avatarFile)
+    const baseDir = path.resolve(env.CDN_TEMP_USERS)
+    const targetPath = path.resolve(baseDir, avatar)
+
+    // critical security check: prevent directory traversal
+    if (!targetPath.startsWith(baseDir + path.sep)) {
+      logger.warn(`Directory traversal attempt: ${avatar}`)
+      res.status(403).send('Forbidden')
+      return
+    }
+
+    if (await helper.pathExists(targetPath)) {
+      await asyncFs.unlink(targetPath)
+    } else {
+      throw new Error(`[user.deleteTempAvatar] temp avatar ${avatar} not found`)
+    }
 
     res.sendStatus(200)
   } catch (err) {
-    logger.error(`[user.deleteTempAvatar] ${i18n.t('DB_ERROR')} ${avatar}`, err)
+    logger.error(`[user.deleteTempAvatar] ${i18n.t('ERROR')} ${avatar}`, err)
     res.status(400).send(i18n.t('ERROR') + err)
   }
 }
@@ -1337,6 +1603,21 @@ export const changePassword = async (req: Request, res: Response) => {
       return
     }
 
+    // begin of security check
+    const sessionUserId = req.user?._id
+    const sessionUser = await User.findById(sessionUserId)
+    if (!sessionUser
+      || (sessionUser.type === bookcarsTypes.UserType.User && sessionUserId !== user._id.toString())
+      || (sessionUser.type === bookcarsTypes.UserType.Supplier
+        && ((user.type === bookcarsTypes.UserType.User && sessionUserId !== user.supplier?.toString())
+          || (user.type === bookcarsTypes.UserType.Supplier && sessionUserId !== user._id.toString())))
+    ) {
+      logger.error(`[user.changePassword] Unauthorized attempt to change user password ${_id} by user ${sessionUserId}`)
+      res.status(403).send('Forbidden: You cannot change user password')
+      return
+    }
+    // end of security check
+
     if (strict && !user.password) {
       logger.error('[user.changePassword] User.password not found:', _id)
       res.sendStatus(204)
@@ -1363,7 +1644,7 @@ export const changePassword = async (req: Request, res: Response) => {
 
     return _changePassword()
   } catch (err) {
-    logger.error(`[user.changePassword] ${i18n.t('DB_ERROR')} ${_id}`, err)
+    logger.error(`[user.changePassword] ${i18n.t('ERROR')} ${_id}`, err)
     res.status(400).send(i18n.t('ERROR') + err)
   }
 }
@@ -1406,7 +1687,7 @@ export const checkPassword = async (req: Request, res: Response) => {
     logger.error('[user.checkPassword] User not found:', id)
     res.sendStatus(204)
   } catch (err) {
-    logger.error(`[user.checkPassword] ${i18n.t('DB_ERROR')} ${id}`, err)
+    logger.error(`[user.checkPassword] ${i18n.t('ERROR')} ${id}`, err)
     res.status(400).send(i18n.t('ERROR') + err)
   }
 }
@@ -1422,6 +1703,14 @@ export const checkPassword = async (req: Request, res: Response) => {
  */
 export const getUsers = async (req: Request, res: Response) => {
   try {
+    // begin of security check
+    const sessionUserId = req.user?._id
+    const sessionUser = await User.findById(sessionUserId)
+    if (!sessionUser || sessionUser.type === bookcarsTypes.UserType.User) {
+      throw new Error('Forbidden: You cannot fetch users')
+    }
+    // end of security check
+
     const keyword = escapeStringRegexp(String(req.query.s || ''))
     const options = 'i'
     const page = Number.parseInt(req.params.page, 10)
@@ -1489,8 +1778,8 @@ export const getUsers = async (req: Request, res: Response) => {
 
     res.json(users)
   } catch (err) {
-    logger.error(`[user.getUsers] ${i18n.t('DB_ERROR')}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[user.getUsers] ${i18n.t('ERROR')}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -1508,10 +1797,23 @@ export const deleteUsers = async (req: Request, res: Response) => {
     const { body }: { body: string[] } = req
     const ids: mongoose.Types.ObjectId[] = body.map((id: string) => new mongoose.Types.ObjectId(id))
 
+    const sessionUserId = req.user?._id
+    const sessionUser = await User.findById(sessionUserId)
+
+    let unauthorizedAttemptLogged = false
     for (const id of ids) {
       const user = await User.findById(id)
 
       if (user) {
+        // begin of security check
+        if (!sessionUser || sessionUser.type === bookcarsTypes.UserType.User || (sessionUser.type === bookcarsTypes.UserType.Supplier && sessionUserId !== user.supplier?.toString())) {
+          logger.error(`[user.delete] Unauthorized attempt to delete user ${id} by user ${sessionUserId}`)
+          unauthorizedAttemptLogged = true
+          continue
+        }
+        // end of security check
+
+
         await User.deleteOne({ _id: id })
 
         if (user.avatar) {
@@ -1570,10 +1872,15 @@ export const deleteUsers = async (req: Request, res: Response) => {
       }
     }
 
+    if (unauthorizedAttemptLogged) {
+      res.status(403).send('Forbidden: You cannot delete some of the users')
+      return
+    }
+
     res.sendStatus(200)
   } catch (err) {
-    logger.error(`[user.delete] ${i18n.t('DB_ERROR')} ${JSON.stringify(req.body)}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[user.delete] ${i18n.t('ERROR')} ${JSON.stringify(req.body)}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -1597,8 +1904,8 @@ export const verifyRecaptcha = async (req: Request, res: Response) => {
     }
     res.sendStatus(204)
   } catch (err) {
-    logger.error(`[user.delete] ${i18n.t('DB_ERROR')} ${JSON.stringify(req.body)}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[user.delete] ${i18n.t('ERROR')} ${JSON.stringify(req.body)}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -1667,8 +1974,8 @@ export const hasPassword = async (req: Request, res: Response) => {
 
     res.sendStatus(204)
   } catch (err) {
-    logger.error(`[user.hasPassword] ${i18n.t('DB_ERROR')} ${id}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[user.hasPassword] ${i18n.t('ERROR')} ${id}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -1693,10 +2000,17 @@ export const createLicense = async (req: Request, res: Response) => {
     const filename = `${nanoid()}${path.extname(req.file.originalname)}`
     const filepath = path.join(env.CDN_TEMP_LICENSES, filename)
 
+    // security check: restrict allowed extensions
+    const ext = path.extname(filename)
+    if (!env.allowedLicenseExtensions.includes(ext.toLowerCase())) {
+      res.status(400).send('Invalid license file type')
+      return
+    }
+
     await asyncFs.writeFile(filepath, req.file.buffer)
     res.json(filename)
   } catch (err) {
-    logger.error(`[user.createLicense] ${i18n.t('DB_ERROR')}`, err)
+    logger.error(`[user.createLicense] ${i18n.t('ERROR')}`, err)
     res.status(400).send(i18n.t('ERROR') + err)
   }
 }
@@ -1738,6 +2052,13 @@ export const updateLicense = async (req: Request, res: Response) => {
       const filename = `${user._id.toString()}${path.extname(file.originalname)}`
       const filepath = path.join(env.CDN_LICENSES, filename)
 
+      // security check: restrict allowed extensions
+      const ext = path.extname(filename)
+      if (!env.allowedLicenseExtensions.includes(ext.toLowerCase())) {
+        res.status(400).send('Invalid license file type')
+        return
+      }
+
       await asyncFs.writeFile(filepath, file.buffer)
 
       user.license = filename
@@ -1748,8 +2069,8 @@ export const updateLicense = async (req: Request, res: Response) => {
 
     res.sendStatus(204)
   } catch (err) {
-    logger.error(`[user.updateLicense] ${i18n.t('DB_ERROR')} ${id}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[user.updateLicense] ${i18n.t('ERROR')} ${id}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -1787,8 +2108,8 @@ export const deleteLicense = async (req: Request, res: Response) => {
     }
     res.sendStatus(204)
   } catch (err) {
-    logger.error(`[user.deleteLicense] ${i18n.t('DB_ERROR')} ${id}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[user.deleteLicense] ${i18n.t('ERROR')} ${id}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -1805,17 +2126,29 @@ export const deleteTempLicense = async (req: Request, res: Response) => {
   const { file } = req.params
 
   try {
-    if (!file.includes('.')) {
-      throw new Error('Filename not valid')
+    // prevent null bytes
+    if (file.includes('\0')) {
+      res.status(400).send('Invalid filename')
+      return
     }
-    const licenseFile = path.join(env.CDN_TEMP_LICENSES, file)
-    if (await helper.pathExists(licenseFile)) {
-      await asyncFs.unlink(licenseFile)
+
+    const baseDir = path.resolve(env.CDN_TEMP_LICENSES)
+    const targetPath = path.resolve(baseDir, file)
+
+    // critical security check: prevent directory traversal
+    if (!targetPath.startsWith(baseDir + path.sep)) {
+      logger.warn(`Directory traversal attempt: ${file}`)
+      res.status(403).send('Forbidden')
+      return
+    }
+
+    if (await helper.pathExists(targetPath)) {
+      await asyncFs.unlink(targetPath)
     }
 
     res.sendStatus(200)
   } catch (err) {
-    logger.error(`[user.deleteTempLicense] ${i18n.t('DB_ERROR')} ${file}`, err)
+    logger.error(`[user.deleteTempLicense] ${i18n.t('ERROR')} ${file}`, err)
     res.status(400).send(i18n.t('ERROR') + err)
   }
 }

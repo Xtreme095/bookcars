@@ -6,7 +6,8 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import ReactSlick from 'react-slick'
+import Slider from 'react-slick'
+const ReactSlick = (Slider as any).default || Slider
 
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
@@ -62,16 +63,18 @@ interface SlickProps extends ComponentPropsWithRef<typeof ReactSlick> {
   children: React.ReactNode
 }
 
-const Slick = forwardRef<ReactSlick, SlickProps>(({ children, ...props }, ref) => {
-  const slickRef = useRef<ReactSlick>(null)
+const Slick = forwardRef<typeof ReactSlick, SlickProps>(({ children, ...props }, ref) => {
+  const slickRef = useRef<typeof ReactSlick>(null)
 
-  useImperativeHandle(
-    ref,
-    () =>
-    ({
-      ...slickRef.current,
-    } as ReactSlick),
-  )
+  // useImperativeHandle(
+  //   ref,
+  //   () =>
+  //   ({
+  //     ...slickRef.current,
+  //   } as ReactSlick),
+  // )
+
+  useImperativeHandle(ref, () => slickRef.current as typeof ReactSlick)
 
   const {
     handleMouseDown,
@@ -95,6 +98,7 @@ const Slick = forwardRef<ReactSlick, SlickProps>(({ children, ...props }, ref) =
         <div
           onMouseDownCapture={handleMouseDown}
           onClickCapture={handleChildClick}
+          aria-modal="true"
         >
           {child}
         </div>

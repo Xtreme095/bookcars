@@ -108,7 +108,7 @@ const SocialLogin = ({
             appId={env.FB_APP_ID}
             redirect_uri={REDIRECT_URI}
             onResolve={({ data }: IResolveParams) => {
-              loginSuccess(bookcarsTypes.SocialSignInType.Facebook, data?.signedRequest, data?.email, data?.name, data?.picture?.data?.url)
+              loginSuccess(bookcarsTypes.SocialSignInType.Facebook, data?.accessToken, data?.email, data?.name, data?.picture?.data?.url)
             }}
             onReject={(err: any) => {
               loginError(err)
@@ -140,11 +140,12 @@ const SocialLogin = ({
         {google && (
           <LoginSocialGoogle
             client_id={env.GG_APP_ID}
+            typeResponse="idToken"
             redirect_uri={REDIRECT_URI}
             scope="openid profile email"
             discoveryDocs="claims_supported"
             onResolve={({ data }: IResolveParams) => {
-              loginSuccess(bookcarsTypes.SocialSignInType.Google, data?.access_token, data?.email, data?.name || data?.email, data?.picture)
+              loginSuccess(bookcarsTypes.SocialSignInType.Google, data?.credential, data?.email, data?.name || data?.email, data?.picture)
             }}
             onReject={(err: any) => {
               loginError(err)

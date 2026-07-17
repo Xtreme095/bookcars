@@ -486,6 +486,48 @@ export const SENTRY_DSN_BACKEND = __env__('BC_SENTRY_DSN_BACKEND', ENABLE_SENTRY
 export const SENTRY_TRACES_SAMPLE_RATE = Number.parseFloat(__env__('BC_SENTRY_TRACES_SAMPLE_RATE', false, '1.0'))
 
 /**
+ * Apple Web client ID.
+ *
+ * @type {string}
+ */
+export const APPLE_CLIENT_ID_WEB = __env__('BC_APPLE_CLIENT_ID_WEB', false, 'APPLE_CLIENT_ID_WEB')
+
+/**
+ * Apple Mobile client ID.
+ *
+ * @type {string}
+ */
+export const APPLE_CLIENT_ID_MOBILE = __env__('BC_APPLE_CLIENT_ID_MOBILE', false, 'APPLE_CLIENT_ID_MOBILE')
+
+/**
+ * Google client ID.
+ *
+ * @type {string}
+ */
+export const GOOGLE_CLIENT_ID = __env__('BC_GOOGLE_CLIENT_ID', false, 'GOOGLE_CLIENT_ID')
+
+/**
+ * Google mobile app Web client ID.
+ *
+ * @type {string}
+ */
+export const GOOGLE_MOBILE_CLIENT_ID = __env__('BC_GOOGLE_MOBILE_CLIENT_ID', false, 'GOOGLE_MOBILE_CLIENT_ID')
+
+/**
+ * Facebook App ID.
+ *
+ * @type {string}
+ */
+export const FACEBOOK_APP_ID = __env__('BC_FACEBOOK_APP_ID', false, 'FACEBOOK_APP_ID')
+
+/**
+ * Facebook App Secret.
+ *
+ * @type {string}
+ */
+export const FACEBOOK_APP_SECRET = __env__('BC_FACEBOOK_APP_SECRET', false, 'FACEBOOK_APP_SECRET')
+
+/**
  * User Document.
  *
  * @export
@@ -972,6 +1014,46 @@ export interface Setting extends Document {
   minPickupDropoffHour: number
   maxPickupDropoffHour: number
 }
+
+/**
+ * Allowed driver's license file extensions.
+ *
+ * @type {string[]}
+ */
+export const allowedImageExtensions = [
+  '.jpg',
+  '.jpeg',
+  '.png',
+  '.webp',
+  '.gif',
+  '.bmp',
+  '.tiff',
+]
+
+/**
+ * Allowed driver's license file extensions.
+ *
+ * @type {string[]}
+ */
+export const allowedLicenseExtensions = [
+  '.jpg',
+  '.jpeg',
+  '.png',
+  '.webp',
+  '.gif',
+  '.bmp',
+  '.tiff',
+  '.pdf',
+]
+
+/**
+ * Allowed supplier contract file extensions.
+ *
+ * @type {string[]}
+ */
+export const allowedContractExtensions = [
+  '.pdf',
+]
 
 /**
  * CommissionTransaction Document.

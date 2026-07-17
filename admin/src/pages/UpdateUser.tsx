@@ -65,6 +65,7 @@ const UpdateUser = () => {
       type: '',
       fullName: '',
       email: '',
+      birthDate: undefined,
       phone: '',
       location: '',
       bio: '',
@@ -80,6 +81,7 @@ const UpdateUser = () => {
   const type = useWatch({ control, name: 'type' })
   const fullName = useWatch({ control, name: 'fullName' })
   const email = useWatch({ control, name: 'email' })
+  const birthDate = useWatch({ control, name: 'birthDate' })
   const blacklisted = useWatch({ control, name: 'blacklisted' })
   const payLater = useWatch({ control, name: 'payLater' })
   const licenseRequired = useWatch({ control, name: 'licenseRequired' })
@@ -159,7 +161,7 @@ const UpdateUser = () => {
               setValue('phone', _user.phone || '')
               setValue('location', _user.location || '')
               setValue('bio', _user.bio || '')
-              setValue('birthDate', _user && _user.birthDate ? new Date(_user.birthDate) : undefined)
+              setValue('birthDate', _user.birthDate ? new Date(_user.birthDate) : undefined)
               setValue('payLater', _user.payLater || false)
               setValue('licenseRequired', _user.licenseRequired || false)
               setValue('minimumRentalDays', _user.minimumRentalDays?.toString() || '')
@@ -192,6 +194,7 @@ const UpdateUser = () => {
   const validateFullName = async (value?: string) => {
     if (!!value && type === bookcarsTypes.UserType.Supplier && user?.fullName !== value) {
       const status = await SupplierService.validate({ fullName: value })
+      
       if (status !== 200) {
         setError('fullName', { message: csStrings.INVALID_SUPPLIER_NAME })
         setFocus('fullName')
@@ -205,6 +208,12 @@ const UpdateUser = () => {
     try {
       if (!user) {
         helper.error()
+        return
+      }
+
+      if (type === bookcarsTypes.RecordType.Supplier && !avatar) {
+        setAvatarError(true)
+        setFormError(false)
         return
       }
 
@@ -239,6 +248,8 @@ const UpdateUser = () => {
         _user.type = type
         setUser(_user)
         helper.info(commonStrings.UPDATED)
+        setAvatarError(false)
+        setFormError(false)
       } else {
         helper.error()
 
@@ -307,7 +318,7 @@ const UpdateUser = () => {
               <FormControl fullWidth margin="dense">
                 <InputLabel className="required">{commonStrings.FULL_NAME}</InputLabel>
                 <Input
-                  // {...register('fullName')}
+                  {...register('fullName')}
                   value={fullName}
                   type="text"
                   error={!!errors.fullName}
@@ -359,14 +370,15 @@ const UpdateUser = () => {
                   <FormControl fullWidth margin="dense">
                     <DatePicker
                       label={commonStrings.BIRTH_DATE}
+                      value={birthDate}
                       variant="standard"
                       required
-                      onChange={(birthDate) => {
-                        if (birthDate) {
+                      onChange={(date) => {
+                        if (date) {
                           if (errors.birthDate) {
                             clearErrors('birthDate')
                           }
-                          setValue('birthDate', birthDate, { shouldValidate: true })
+                          setValue('birthDate', date, { shouldValidate: true })
                         }
                       }}
                       language={(user && user.language) || env.DEFAULT_LANGUAGE}

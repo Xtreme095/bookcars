@@ -1,5 +1,86 @@
 # Releases
 
+## [BookCars 8.7](https://github.com/aelassas/bookcars/releases/tag/v8.7) – 2026-03-18
+
+* fix(backend): optimize mailer with transporter pooling
+* fix(backend): enable secure connection for implicit TLS SMTP server
+* fix(admin,frontend): Spanish locale not applied correctly to dates
+* fix(frontend): resolve location carrousel responsive layout on mobile
+* chore(admin,frontend): upgrade to Vite 8
+* chore(deps): update dependencies
+
+### Assets
+- [bookcars-8.7.apk](https://github.com/aelassas/bookcars/releases/download/v8.7/bookcars-8.7.apk) (114.45 MB)
+- [bookcars-db.zip](https://github.com/aelassas/bookcars/releases/download/v8.7/bookcars-db.zip) (8.64 MB)
+
+### Source Code
+- [Source code (zip)](https://api.github.com/repos/aelassas/bookcars/zipball/v8.7)
+- [Source code (tar)](https://api.github.com/repos/aelassas/bookcars/tarball/v8.7)
+
+## [BookCars 8.6](https://github.com/aelassas/bookcars/releases/tag/v8.6) – 2026-03-03
+
+* chore(mobile): upgrade to Expo SDK 55
+* feat(mobile): migrate navigation from react-navigation to expo-router
+* fix(mobile): prevent loading spinner from persisting in property and booking lists
+* fix(mobile): implement spanish localization for checkout, notifications and bookings
+* fix(mobile): user context not set after email sign up
+* fix(mobile): text not centered in forgot password result screen
+* fix(mobile): apply locale correctly in checkout screen
+* fix(auth): handle apple login email persistence for web and mobile
+
+### Assets
+- [bookcars-8.6.apk](https://github.com/aelassas/bookcars/releases/download/v8.6/bookcars-8.6.apk) (114.44 MB)
+- [bookcars-db.zip](https://github.com/aelassas/bookcars/releases/download/v8.6/bookcars-db.zip) (8.64 MB)
+
+### Source Code
+- [Source code (zip)](https://api.github.com/repos/aelassas/bookcars/zipball/v8.6)
+- [Source code (tar)](https://api.github.com/repos/aelassas/bookcars/tarball/v8.6)
+
+## [BookCars 8.5](https://github.com/aelassas/bookcars/releases/tag/v8.5) – 2026-03-01
+
+* feat(mobile): enable React Native New Architecture
+* fix(security): enforce backend verification of mobile social auth tokens
+* fix(db): properly detect, create and update TTL indexes
+* fix(mobile): ignore Google sign-in cancellation to prevent false error popup
+* fix(mobile): add Spanish default locale detection
+
+### Assets
+- [bookcars-8.5.apk](https://github.com/aelassas/bookcars/releases/download/v8.5/bookcars-8.5.apk) (100.77 MB)
+- [bookcars-db.zip](https://github.com/aelassas/bookcars/releases/download/v8.5/bookcars-db.zip) (8.64 MB)
+
+### Source Code
+- [Source code (zip)](https://api.github.com/repos/aelassas/bookcars/zipball/v8.5)
+- [Source code (tar)](https://api.github.com/repos/aelassas/bookcars/tarball/v8.5)
+
+## [BookCars 8.4](https://github.com/aelassas/bookcars/releases/tag/v8.4) – 2026-02-28
+
+* feat(mobile): add Apple, Google, and Facebook authentication
+* fix(security): unrestricted file uploads and renames (#98)
+* fix(security): prevent directory traversal in file delete routes (#98)
+* fix(security): prevent directory traversal in file rename routes (#98)
+* fix(security): unauthenticated admin registration (#99)
+* fix(security): move route authentication to dedicated middlewares (#99)
+* fix(security): verify Google, Facebook, and Apple tokens cryptographically in backend (#99)
+* fix(security): systemic cross-supplier IDOR and unauthenticated admin registration (#99)
+* fix(sercurity): prevent non admin users from modifying user roles (#99)
+* fix(security): prevent non admin users from modifying other users' language (#99)
+* fix(security): restrict change password page to authorized users only (#99)
+* fix(security): restrict fetching users to admin and supplier only (#99)
+* fix(security): restrict location update and delete operations to authorized users only
+* fix(security): restrict car update and delete operations to authorized users only
+* fix(security): get booking route not protected by auth middleware
+* fix(admin): birthDate field not set initially in update user form
+* fix(admin): supplier full name validation not working
+* chore(deps): update dependencies
+
+### Assets
+- [bookcars-8.4.apk](https://github.com/aelassas/bookcars/releases/download/v8.4/bookcars-8.4.apk) (100.77 MB)
+- [bookcars-db.zip](https://github.com/aelassas/bookcars/releases/download/v8.4/bookcars-db.zip) (8.64 MB)
+
+### Source Code
+- [Source code (zip)](https://api.github.com/repos/aelassas/bookcars/zipball/v8.4)
+- [Source code (tar)](https://api.github.com/repos/aelassas/bookcars/tarball/v8.4)
+
 ## [BookCars 8.3](https://github.com/aelassas/bookcars/releases/tag/v8.3) – 2025-12-21
 
 * chore(backend): migrate to `mongoose` 9.0.2

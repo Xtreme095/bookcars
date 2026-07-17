@@ -1,6 +1,7 @@
 import { Platform } from 'react-native'
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { router } from 'expo-router'
 import * as Localization from 'expo-localization'
+import { decode as atob } from 'base-64'
 import axiosInstance from './axiosInstance'
 import * as env from '@/config/env.config'
 import * as AsyncStorage from '@/utils/AsyncStorage'
@@ -129,6 +130,24 @@ export const signin = async (data: bookcarsTypes.SignInPayload): Promise<{ statu
     })
 
 /**
+ * Social sign in.
+ *
+ * @param {bookcarsTypes.SignInPayload} data
+ * @returns {Promise<{ status: number, data: bookcarsTypes.User }>}
+ */
+export const socialSignin = (data: bookcarsTypes.SignInPayload): Promise<{ status: number, data: bookcarsTypes.User }> =>
+  axiosInstance
+    .post(
+      '/api/social-sign-in',
+      data,
+      { withCredentials: true }
+    )
+    .then(async (res) => {
+      await AsyncStorage.storeObject('bc-user', res.data)
+      return { status: res.status, data: res.data }
+    })
+
+/**
  * Get push notification token.
  *
  * @async
@@ -186,23 +205,18 @@ export const deletePushToken = async (userId: string): Promise<number> => {
  * Sign out.
  *
  * @async
- * @param {NativeStackNavigationProp<StackParams, keyof StackParams>} navigation
- * @param {boolean} [redirect=true]
+ * @param {boolean} [redirectHome=true]
  * @param {boolean} [redirectSignin=false]
  * @returns {void}
  */
-export const signout = async (
-  navigation: NativeStackNavigationProp<StackParams, keyof StackParams>,
-  redirect = true,
-  redirectSignin = false
-) => {
+export const signout = async (redirectHome = true, redirectSignin = false) => {
   await AsyncStorage.removeItem('bc-user')
 
-  if (redirect) {
-    navigation.navigate('Home', { d: new Date().getTime() })
-  }
-  if (redirectSignin) {
-    navigation.navigate('SignIn', {})
+  const now = new Date().getTime().toString()
+  if (redirectHome) {
+    router.push({ pathname: '/', params: { d: now } })
+  } else if (redirectSignin) {
+    router.push({ pathname: '/sign-in', params: { d: now } })
   }
 }
 
@@ -276,6 +290,7 @@ export const getLanguage = async () => {
   if (user && user.language) {
     return user.language
   }
+
   let lang = await AsyncStorage.getString('bc-language')
 
   if (lang && lang.length === 2) {
@@ -286,12 +301,22 @@ export const getLanguage = async () => {
   return lang
 }
 
+/**
+ * Returns the default application language based on device settings.
+ * Falls back to env.DEFAULT_LANGUAGE if unsupported.
+ *
+ * @returns {string} 
+ */
 export const getDefaultLanguage = () => {
   const locales = Localization.getLocales()
-  const lang = locales.length > 0 && locales[0].languageCode === 'fr' ? 'fr' : env.DEFAULT_LANGUAGE
-  return lang
-}
+  const languageCode = locales?.[0]?.languageCode?.toLowerCase() || ''
 
+  const supportedLanguages = ['en', 'fr', 'es']
+
+  return supportedLanguages.includes(languageCode)
+    ? languageCode
+    : env.DEFAULT_LANGUAGE
+}
 
 /**
  * Update user's langauge.
@@ -617,3 +642,39 @@ export const deleteTempLicense = (file: string): Promise<number> =>
       null,
     )
     .then((res) => res.status)
+
+/**
+* Parse JWT token.
+* @param {string} token
+* @returns {any}
+*/
+export const parseJwt = (token: string) => {
+  try {
+    // 1. Basic validation
+    if (!token || !token.includes('.')) {
+      return {}
+    }
+
+    // 2. Extract the payload (middle part)
+    const base64Url = token.split('.')[1]
+
+    // 3. Convert Base64URL to standard Base64
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+
+    // 4. Decode the string (works on web and native thanks to 'base-64' library)
+    const decoded = atob(base64)
+
+    // 5. Handle UTF-8 / Special characters
+    const jsonPayload = decodeURIComponent(
+      decoded
+        .split('')
+        .map((c) => `%${(`00${c.charCodeAt(0).toString(16)}`).slice(-2)}`)
+        .join('')
+    )
+
+    return JSON.parse(jsonPayload)
+  } catch (error) {
+    console.error('JWT Parse Error:', error)
+    return {}
+  }
+}

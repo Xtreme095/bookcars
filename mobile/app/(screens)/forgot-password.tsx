@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { StyleSheet, ScrollView, View, Text, TextInput as ReactTextInput } from 'react-native'
-import { useIsFocused } from '@react-navigation/native'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { useIsFocused, useLocalSearchParams, useRouter } from 'expo-router'
 
 import validator from 'validator'
 
@@ -12,9 +11,12 @@ import * as UserService from '@/services/UserService'
 import * as helper from '@/utils/helper'
 import Link from '@/components/Link'
 import Header from '@/components/Header'
+import SocialLogin from '@/components/SocialLogin'
 
-const ForgotPasswordScreen = ({ navigation, route }: NativeStackScreenProps<StackParams, 'ForgotPassword'>) => {
+const ForgotPasswordScreen = () => {
   const isFocused = useIsFocused()
+  const router = useRouter()
+  const { d } = useLocalSearchParams<{ d: string }>()
   const [email, setEmail] = useState('')
   const [emailRequired, setEmailRequired] = useState(false)
   const [emailError, setEmailError] = useState(false)
@@ -39,7 +41,7 @@ const ForgotPasswordScreen = ({ navigation, route }: NativeStackScreenProps<Stac
     if (isFocused) {
       _init()
     }
-  }, [route.params, isFocused])
+  }, [d, isFocused])
 
   const validateEmail = async () => {
     if (email) {
@@ -106,7 +108,7 @@ const ForgotPasswordScreen = ({ navigation, route }: NativeStackScreenProps<Stac
 
   return (
     <View style={styles.master}>
-      <Header route={route} title={i18n.t('FORGOT_PASSWORD')} hideTitle={false} loggedIn={false} />
+      <Header title={i18n.t('FORGOT_PASSWORD')} hideTitle={false} loggedIn={false} />
 
       <ScrollView
         contentContainerStyle={styles.container}
@@ -115,7 +117,7 @@ const ForgotPasswordScreen = ({ navigation, route }: NativeStackScreenProps<Stac
         {sent && (
           <View style={styles.contentContainer}>
             <Text style={styles.text}>{i18n.t('RESET_EMAIL_SENT')}</Text>
-            <Link label={i18n.t('GO_TO_HOME')} onPress={() => navigation.navigate('Home', {})} />
+            <Link label={i18n.t('GO_TO_HOME')} onPress={() => router.push('/')} />
           </View>
         )}
         {!sent && (
@@ -131,6 +133,8 @@ const ForgotPasswordScreen = ({ navigation, route }: NativeStackScreenProps<Stac
               onSubmitEditing={onPressReset}
               onChangeText={onChangeEmail}
             />
+
+            <SocialLogin />
 
             <Button style={styles.component} label={i18n.t('RESET')} onPress={onPressReset} />
           </View>
@@ -151,6 +155,7 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
     margin: 10,
     padding: 5,
+    textAlign: 'center',
   },
   container: {
     justifyContent: 'center',

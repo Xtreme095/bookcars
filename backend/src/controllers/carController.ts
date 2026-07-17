@@ -50,19 +50,57 @@ export const create = async (req: Request, res: Response) => {
     const car = new Car({ ...carFields, dateBasedPrices: dateBasedPriceIds })
     await car.save()
 
-    const image = path.join(env.CDN_TEMP_CARS, body.image)
+    // --------- image ---------
+    // 1. Sanitize filename
+    const safeImage = path.basename(body.image)
 
-    if (await helper.pathExists(image)) {
-      const filename = `${car._id}_${Date.now()}${path.extname(body.image)}`
-      const newPath = path.join(env.CDN_CARS, filename)
+    // If basename modified it → traversal attempt
+    if (safeImage !== body.image) {
+      await Car.deleteOne({ _id: car._id })
+      logger.warn(`[car.create] Directory traversal attempt (image): ${body.image}`)
+      throw new Error('Invalid image filename')
+    }
 
-      await asyncFs.rename(image, newPath)
+    const tempDir = path.resolve(env.CDN_TEMP_CARS)
+    const carsDir = path.resolve(env.CDN_CARS)
+
+    const sourcePath = path.resolve(tempDir, safeImage)
+
+    // 2. Ensure source stays inside temp directory
+    if (!sourcePath.startsWith(tempDir + path.sep)) {
+      await Car.deleteOne({ _id: car._id })
+      logger.warn(`[car.create] Source path escape attempt: ${sourcePath}`)
+      throw new Error('Invalid image path')
+    }
+
+    if (await helper.pathExists(sourcePath)) {
+      const ext = path.extname(safeImage).toLowerCase()
+
+      // 3. Restrict allowed extensions
+      if (!env.allowedImageExtensions.includes(ext)) {
+        await Car.deleteOne({ _id: car._id })
+        throw new Error('Invalid image type')
+      }
+
+      const filename = `${car._id}_${Date.now()}${ext}`
+      const newPath = path.resolve(carsDir, filename)
+
+      // 4. Ensure destination stays inside cars directory
+      if (!newPath.startsWith(carsDir + path.sep)) {
+        await Car.deleteOne({ _id: car._id })
+        logger.warn(`[car.create] Destination path escape attempt: ${newPath}`)
+        throw new Error('Invalid image destination')
+      }
+
+      await asyncFs.rename(sourcePath, newPath)
+
       car.image = filename
       await car.save()
     } else {
       await Car.deleteOne({ _id: car._id })
-      throw new Error(`Image ${body.image} not found`)
+      throw new Error(`Image ${safeImage} not found`)
     }
+    // --------- image ---------
 
     // notify admin if the car was created by a supplier
     if (body.loggedUser) {
@@ -117,7 +155,7 @@ ${i18n.t('REGARDS')}<br>
 
     res.json(car)
   } catch (err) {
-    logger.error(`[car.create] ${i18n.t('DB_ERROR')} ${JSON.stringify(body)}`, err)
+    logger.error(`[car.create] ${i18n.t('ERROR')} ${JSON.stringify(body)}`, err)
     res.status(400).send(i18n.t('ERROR') + err)
   }
 }
@@ -152,6 +190,16 @@ export const update = async (req: Request, res: Response) => {
     const car = await Car.findById(_id)
 
     if (car) {
+      // begin of security check
+      const sessionUserId = req.user?._id
+      const sessionUser = await User.findById(sessionUserId)
+      if (!sessionUser || (sessionUser.type === bookcarsTypes.UserType.Supplier && car.supplier?.toString() !== sessionUserId)) {
+        logger.error(`[car.update] Unauthorized attempt to update car ${car._id} by user ${sessionUserId}`)
+        res.status(403).send('Forbidden: You cannot update this location')
+        return
+      }
+      // end of security check
+
       const {
         supplier,
         name,
@@ -275,7 +323,7 @@ export const update = async (req: Request, res: Response) => {
     logger.error('[car.update] Car not found:', _id)
     res.sendStatus(204)
   } catch (err) {
-    logger.error(`[car.update] ${i18n.t('DB_ERROR')} ${_id}`, err)
+    logger.error(`[car.update] ${i18n.t('ERROR')} ${_id}`, err)
     res.status(400).send(i18n.t('ERROR') + err)
   }
 }
@@ -306,7 +354,7 @@ export const checkCar = async (req: Request, res: Response) => {
 
     res.sendStatus(204)
   } catch (err) {
-    logger.error(`[car.check] ${i18n.t('DB_ERROR')} ${id}`, err)
+    logger.error(`[car.check] ${i18n.t('ERROR')} ${id}`, err)
     res.status(400).send(i18n.t('ERROR') + err)
   }
 }
@@ -331,8 +379,8 @@ export const validateLicensePlate = async (req: Request, res: Response) => {
       res.sendStatus(200)
     }
   } catch (err) {
-    logger.error(`[car.validateLicensePlate] ${i18n.t('DB_ERROR')} ${licensePlate}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[car.validateLicensePlate] ${i18n.t('ERROR')} ${licensePlate}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -356,8 +404,8 @@ export const validateCarLicensePlate = async (req: Request, res: Response) => {
       res.sendStatus(200)
     }
   } catch (err) {
-    logger.error(`[car.validateLicensePlate] ${i18n.t('DB_ERROR')} ${licensePlate}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[car.validateLicensePlate] ${i18n.t('ERROR')} ${licensePlate}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -376,6 +424,16 @@ export const deleteCar = async (req: Request, res: Response) => {
   try {
     const car = await Car.findById(id)
     if (car) {
+      // begin of security check
+      const sessionUserId = req.user?._id
+      const sessionUser = await User.findById(sessionUserId)
+      if (!sessionUser || (sessionUser.type === bookcarsTypes.UserType.Supplier && car.supplier?.toString() !== sessionUserId)) {
+        logger.error(`[car.delete] Unauthorized attempt to delete car ${car._id} by user ${sessionUserId}`)
+        res.status(403).send('Forbidden: You cannot delete this car')
+        return
+      }
+      // end of security check
+
       await Car.deleteOne({ _id: id })
 
       if (car.dateBasedPrices?.length > 0) {
@@ -395,8 +453,8 @@ export const deleteCar = async (req: Request, res: Response) => {
     }
     res.sendStatus(200)
   } catch (err) {
-    logger.error(`[car.delete] ${i18n.t('DB_ERROR')} ${id}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[car.delete] ${i18n.t('ERROR')} ${id}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -418,10 +476,17 @@ export const createImage = async (req: Request, res: Response) => {
     const filename = `${helper.getFilenameWithoutExtension(req.file.originalname)}_${nanoid()}_${Date.now()}${path.extname(req.file.originalname)}`
     const filepath = path.join(env.CDN_TEMP_CARS, filename)
 
+    // security check: restrict allowed extensions
+    const ext = path.extname(filename)
+    if (!env.allowedImageExtensions.includes(ext.toLowerCase())) {
+      res.status(400).send('Invalid car image file type')
+      return
+    }
+
     await asyncFs.writeFile(filepath, req.file.buffer)
     res.json(filename)
   } catch (err) {
-    logger.error(`[car.createImage] ${i18n.t('DB_ERROR')}`, err)
+    logger.error(`[car.createImage] ${i18n.t('ERROR')}`, err)
     res.status(400).send(i18n.t('ERROR') + err)
   }
 }
@@ -461,6 +526,13 @@ export const updateImage = async (req: Request, res: Response) => {
       const filename = `${car._id}_${Date.now()}${path.extname(file.originalname)}`
       const filepath = path.join(env.CDN_CARS, filename)
 
+      // security check: restrict allowed extensions
+      const ext = path.extname(filename)
+      if (!env.allowedImageExtensions.includes(ext.toLowerCase())) {
+        res.status(400).send('Invalid car image file type')
+        return
+      }
+
       await asyncFs.writeFile(filepath, file.buffer)
       car.image = filename
       await car.save()
@@ -471,8 +543,8 @@ export const updateImage = async (req: Request, res: Response) => {
     logger.error('[car.updateImage] Car not found:', id)
     res.sendStatus(204)
   } catch (err) {
-    logger.error(`[car.updateImage] ${i18n.t('DB_ERROR')} ${id}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[car.updateImage] ${i18n.t('ERROR')} ${id}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -507,8 +579,8 @@ export const deleteImage = async (req: Request, res: Response) => {
     logger.error('[car.deleteImage] Car not found:', id)
     res.sendStatus(204)
   } catch (err) {
-    logger.error(`[car.deleteImage] ${i18n.t('DB_ERROR')} ${id}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[car.deleteImage] ${i18n.t('ERROR')} ${id}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -525,16 +597,31 @@ export const deleteTempImage = async (req: Request, res: Response) => {
   const { image } = req.params
 
   try {
-    const imageFile = path.join(env.CDN_TEMP_CARS, image)
-    if (!(await helper.pathExists(imageFile))) {
-      throw new Error(`[car.deleteTempImage] temp image ${imageFile} not found`)
+    // prevent null bytes
+    if (image.includes('\0')) {
+      res.status(400).send('Invalid filename')
+      return
     }
 
-    await asyncFs.unlink(imageFile)
+    const baseDir = path.resolve(env.CDN_TEMP_CARS)
+    const targetPath = path.resolve(baseDir, image)
+
+    // critical security check: prevent directory traversal
+    if (!targetPath.startsWith(baseDir + path.sep)) {
+      logger.warn(`Directory traversal attempt: ${image}`)
+      res.status(403).send('Forbidden')
+      return
+    }
+
+    if (await helper.pathExists(targetPath)) {
+      await asyncFs.unlink(targetPath)
+    } else {
+      throw new Error(`[car.deleteTempImage] temp image ${image} not found`)
+    }
 
     res.sendStatus(200)
   } catch (err) {
-    logger.error(`[car.deleteTempImage] ${i18n.t('DB_ERROR')} ${image}`, err)
+    logger.error(`[car.deleteTempImage] ${i18n.t('ERROR')} ${image}`, err)
     res.status(400).send(i18n.t('ERROR') + err)
   }
 }
@@ -592,7 +679,7 @@ export const getCar = async (req: Request, res: Response) => {
     logger.error('[car.getCar] Car not found:', id)
     res.sendStatus(204)
   } catch (err) {
-    logger.error(`[car.getCar] ${i18n.t('DB_ERROR')} ${id}`, err)
+    logger.error(`[car.getCar] ${i18n.t('ERROR')} ${id}`, err)
     res.status(400).send(i18n.t('ERROR') + err)
   }
 }
@@ -811,8 +898,8 @@ export const getCars = async (req: Request, res: Response) => {
 
     res.json(data)
   } catch (err) {
-    logger.error(`[car.getCars] ${i18n.t('DB_ERROR')} ${req.query.s}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[car.getCars] ${i18n.t('ERROR')} ${req.query.s}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -875,8 +962,8 @@ export const getBookingCars = async (req: Request, res: Response) => {
 
     res.json(cars)
   } catch (err) {
-    logger.error(`[car.getBookingCars] ${i18n.t('DB_ERROR')} ${req.query.s}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[car.getBookingCars] ${i18n.t('ERROR')} ${req.query.s}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }
 
@@ -1213,7 +1300,7 @@ export const getFrontendCars = async (req: Request, res: Response) => {
 
     res.json(data)
   } catch (err) {
-    logger.error(`[car.getFrontendCars] ${i18n.t('DB_ERROR')} ${req.query.s}`, err)
-    res.status(400).send(i18n.t('DB_ERROR') + err)
+    logger.error(`[car.getFrontendCars] ${i18n.t('ERROR')} ${req.query.s}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
   }
 }

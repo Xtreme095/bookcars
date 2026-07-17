@@ -1,14 +1,13 @@
 [![build](https://github.com/aelassas/bookcars/actions/workflows/build.yml/badge.svg)](https://github.com/aelassas/bookcars/actions/workflows/build.yml) 
 [![test](https://github.com/aelassas/bookcars/actions/workflows/test.yml/badge.svg)](https://github.com/aelassas/bookcars/actions/workflows/test.yml) 
-[![coveralls](https://coveralls.io/repos/github/aelassas/bookcars/badge.svg?branch=main)](https://coveralls.io/github/aelassas/bookcars?branch=main)
-[![containerize](https://github.com/aelassas/bookcars/actions/workflows/containerize.yml/badge.svg)](https://github.com/aelassas/bookcars/actions/workflows/containerize.yml) 
+[![codecov](https://img.shields.io/codecov/c/github/aelassas/bookcars?label=coverage)](https://codecov.io/gh/aelassas/bookcars)
 [![loc](https://raw.githubusercontent.com/aelassas/bookcars/refs/heads/loc/badge.svg)](https://github.com/aelassas/bookcars/actions/workflows/loc.yml) 
-[![live demo](https://img.shields.io/badge/live-demo-brightgreen)](https://bookcars.dynv6.net:3002/)
+[![live demo](https://img.shields.io/badge/live-demo-brightgreen)](https://bookcars.dynv6.net/)
 [![docs](https://img.shields.io/badge/docs-wiki-brightgreen)](https://github.com/aelassas/bookcars/wiki)
 
 <!--
 [![docs](https://img.shields.io/badge/docs-wiki-brightgreen)](https://github.com/aelassas/bookcars/wiki)
-[![live demo](https://img.shields.io/badge/live-demo-brightgreen)](https://bookcars.dynv6.net:3002/)
+[![live demo](https://img.shields.io/badge/live-demo-brightgreen)](https://bookcars.dynv6.net/)
 [![loc](https://raw.githubusercontent.com/aelassas/bookcars/refs/heads/loc/badge.svg)](https://github.com/aelassas/bookcars/actions/workflows/loc.yml) 
 [![tested with jest](https://img.shields.io/badge/tested_with-jest-brightgreen?logo=jest)](https://github.com/jestjs/jest)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/aelassas/bookcars/pulls)
@@ -103,7 +102,9 @@ Customers can register through the web frontend or mobile app, search for availa
 
 ## Support & Contributing
 
-If this project helped you, saved you time, or inspired you in any way, please consider supporting its future growth and maintenance. You can show your support by starring the repository (it helps increase visibility and shows your appreciation), sharing the project (recommend it to colleagues, communities, or on social media), or making a donation (if you'd like to financially support the development) via [GitHub Sponsors](https://github.com/sponsors/aelassas) (one-time or monthly), [PayPal](https://www.paypal.me/aelassaspp), or [Buy Me a Coffee](https://www.buymeacoffee.com/aelassas). Open-source software requires time, effort, and resources to maintain—your support helps keep this project alive, up-to-date, and accessible to everyone. Every contribution, big or small, makes a difference and motivates continued work on features, bug fixes, and new ideas.
+If this project helped you, saved you time, or inspired you in any way, please consider supporting its future growth and maintenance. You can show your support by starring the repository (it helps increase visibility and shows your appreciation), sharing the project (recommend it to colleagues, communities, or on social media), or if you'd like to financially support the development via [GitHub Sponsors](https://github.com/sponsors/aelassas) (one-time or monthly), [PayPal](https://www.paypal.me/aelassaspp), or [Buy Me a Coffee](https://www.buymeacoffee.com/aelassas). 
+
+Open-source software requires time, effort, and resources to maintain. Your support helps keep this project alive, up-to-date, and accessible to everyone. Every contribution, big or small, makes a difference and motivates continued work on features, bug fixes, and new ideas.
 
 <!--<a href="https://github.com/sponsors/aelassas"><img src="https://aelassas.github.io/content/github-sponsor-button.png" alt="GitHub" width="210"></a>
 <a href="https://www.paypal.me/aelassaspp"><img src="https://aelassas.github.io/content/paypal-button-v2.png" alt="PayPal" width="208"></a>
@@ -119,7 +120,7 @@ Some features are locked down on the demo links provided. To have access to all 
 -->
 ### Frontend
 
-* URL: https://bookcars.dynv6.net:3002/
+* URL: https://bookcars.dynv6.net/
 * Login: jdoe@bookcars.ma
 * Password: B00kC4r5
 
@@ -137,7 +138,7 @@ You can install the Android app on any Android device.
 
 Open the Camera app and point it at this code. Then tap the notification that appears.
 
-<img alt="" width="120" src="https://bookcars.github.io/content/qr-code-8.3.png">
+<img alt="" width="120" src="https://bookcars.github.io/content/qr-code-8.7.png">
 
 #### How to install the Mobile App on Android
 
@@ -149,26 +150,9 @@ Open the Camera app and point it at this code. Then tap the notification that ap
 
 You can install the Android App by downloading the APK and installing it on any Android device.
 
-* [Download APK](https://github.com/aelassas/bookcars/releases/download/v8.3/bookcars-8.3.apk)
+* [Download APK](https://github.com/aelassas/bookcars/releases/download/v8.7/bookcars-8.7.apk)
 * Login: jdoe@bookcars.ma
 * Password: B00kC4r5
-<!--
-## Website Source Code (bookcars.github.io)
-
-The source code for the official BookCars website is available here:
-
-[https://github.com/bookcars/bookcars.github.io](https://github.com/bookcars/bookcars.github.io)
-
-It features a clean landing page with multilingual support, dark mode, and SEO optimizations to help it reach users in different languages and regions.
-
-The codebase follows the Separation of Concerns (SoC) principle, with a modular and maintainable architecture that aligns with the Single Responsibility Principle (SRP), modularity, and modern frontend best practices. It uses GitHub Actions for automatic builds and deployments. The Android demo app download link is dynamically fetched and updated on the site.
-
-⚡ **Ultra-fast performance**
-
-The website loads in under 1.5 seconds on slow 4G with **0ms blocking**, **0 layout shift**, and a blazing **Speed Index of 0.8**.
-
-Feel free to explore the code, suggest improvements, or use it as a template for your own landing page.
--->
 
 ## License
 

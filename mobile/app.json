@@ -1,9 +1,8 @@
 {
   "expo": {
-    "jsEngine": "hermes",
-    "newArchEnabled": true,
     "name": "BookCars",
-    "version": "8.4.0",
+    "version": "8.8.0",
+    "scheme": "bookcars",
     "slug": "bookcars",
     "icon": "./assets/icon.png",
     "assetBundlePatterns": [
@@ -14,20 +13,22 @@
       "image": "./assets/splash.png"
     },
     "android": {
-      "versionCode": 840,
+      "versionCode": 880,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png"
       },
       "icon": "./assets/icon.png",
       "googleServicesFile": "./google-services.json",
       "softwareKeyboardLayoutMode": "pan",
-      "package": "com.bookcars"
+      "package": "com.bookcars",
+      "backgroundColor": "#00000000"
     },
     "ios": {
-      "buildNumber": "8.4.0",
+      "buildNumber": "8.8.0",
       "supportsTablet": true,
       "icon": "./assets/icon.png",
-      "bundleIdentifier": "com.bookcars"
+      "bundleIdentifier": "com.bookcars",
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "plugins": [
       "expo-localization",
@@ -53,8 +54,25 @@
           "iCloudContainerEnvironment": "Production"
         }
       ],
+      "@react-native-google-signin/google-signin",
+      "expo-apple-authentication",
+      [
+        "react-native-fbsdk-next",
+        {
+          "appID": "FACEBOOK_APP_ID",
+          "clientToken": "FACEBOOK_CLIENT_TOKEN",
+          "displayName": "BookCars",
+          "scheme": "FACEBOOK_SCHEME",
+          "advertiserIDCollectionEnabled": false,
+          "autoLogAppEventsEnabled": false,
+          "isAutoInitEnabled": true
+        }
+      ],
       "expo-asset",
-      "expo-font"
+      "expo-font",
+      "react-native-fbsdk-next",
+      "@react-native-community/datetimepicker",
+      "expo-router"
     ],
     "owner": "aelassas",
     "extra": {
@@ -66,7 +84,8 @@
       "url": "https://u.expo.dev/fe1ab335-41ae-4a35-960b-0052b493db49"
     },
     "experiments": {
-      "tsconfigPaths": true
+      "tsconfigPaths": true,
+      "typedRoutes": true
     },
     "runtimeVersion": {
       "policy": "appVersion"
