@@ -1,0 +1,25 @@
+div.host-document {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+}
+
+div.host-document .filename {
+  flex: 1;
+  cursor: pointer;
+}
+
+div.host-document .filename input {
+  cursor: pointer;
+}
+
+div.host-document .actions {
+  display: flex;
+  flex-direction: row;
+  margin-left: 5px;
+}
+
+div.host-document .actions .icon {
+  color: #121212;
+}

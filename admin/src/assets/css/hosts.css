@@ -1,0 +1,44 @@
+div.hosts {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  height: calc(100vh - 64px);
+}
+
+div.hosts .hosts-toolbar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+div.hosts .hosts-grid {
+  flex: 1;
+  min-height: 0;
+}
+
+div.hosts .host-cell {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+}
+
+div.hosts .avatar-small {
+  width: 28px;
+  height: 28px;
+}
+
+@media only screen and (max-width: 960px) {
+  div.hosts {
+    padding: 10px;
+    height: auto;
+  }
+
+  div.hosts .hosts-grid {
+    min-height: 400px;
+  }
+}

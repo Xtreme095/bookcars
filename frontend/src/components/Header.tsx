@@ -28,6 +28,7 @@ import {
   Login as LoginIcon,
   EventSeat as BookingsIcon,
   CarRental as SupplierIcon,
+  DirectionsCar as HostIcon,
   LocationOn as LocationIcon,
   PrivacyTip as PrivacyIcon,
   QuestionAnswer as FaqIcon,
@@ -40,6 +41,7 @@ import * as bookcarsTypes from ':bookcars-types'
 import env from '@/config/env.config'
 import { strings as commonStrings } from '@/lang/common'
 import { strings as suStrings } from '@/lang/sign-up'
+import { strings as hostStrings } from '@/lang/host'
 import { strings } from '@/lang/header'
 import * as UserService from '@/services/UserService'
 import * as PaymentService from '@/services/PaymentService'
@@ -383,6 +385,15 @@ const Header = ({
                     <ListItemText primary={strings.SUPPLIERS} />
                   </ListItem>
                 )}
+                <ListItem
+                  onClick={() => {
+                    navigate('/become-a-host')
+                    handleSideMenuClose()
+                  }}
+                >
+                  <ListItemIcon><HostIcon /></ListItemIcon>
+                  <ListItemText primary={hostStrings.BECOME_A_HOST} />
+                </ListItem>
                 <ListItem
                   onClick={() => {
                     navigate('/locations')

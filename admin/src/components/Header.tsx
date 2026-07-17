@@ -34,12 +34,14 @@ import {
   CalendarMonth as SchedulerIcon,
   AccountBalance as BankDetailsIcon,
   MonetizationOn as PricingIcon,
+  Diversity3 as HostsIcon,
 } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import * as bookcarsTypes from ':bookcars-types'
 import env from '@/config/env.config'
 import { strings } from '@/lang/header'
 import { strings as commonStrings } from '@/lang/common'
+import { strings as hostStrings } from '@/lang/hosts'
 import * as UserService from '@/services/UserService'
 import * as BankDetailsService from '@/services/BankDetailsService'
 import Avatar from './Avatar'
@@ -329,6 +331,17 @@ const Header = ({
                   <ListItemIcon><SuppliersIcon /></ListItemIcon>
                   <ListItemText primary={strings.COMPANIES} />
                 </ListItem>
+                {helper.admin(user) && (
+                  <ListItem
+                    onClick={() => {
+                      navigate('/hosts')
+                      handleSideMenuClose()
+                    }}
+                  >
+                    <ListItemIcon><HostsIcon /></ListItemIcon>
+                    <ListItemText primary={hostStrings.HOSTS} />
+                  </ListItem>
+                )}
                 <ListItem
                   onClick={() => {
                     navigate('/countries')

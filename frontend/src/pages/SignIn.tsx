@@ -92,6 +92,8 @@ const SignIn = () => {
               to: new Date(Number(params.get('t'))),
             }
           })
+        } else if (from === 'host') {
+          navigate('/host')
         } else {
           navigate('/')
         }

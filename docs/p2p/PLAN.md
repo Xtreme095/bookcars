@@ -1,6 +1,8 @@
 # P2P Conversion Plan — BookCars → Peer-to-Peer Car Sharing (Croatia)
 
-**Status:** PROPOSAL — awaiting approval before implementation
+**Status:** APPROVED — upstream sync (v8.4→v8.8-dev), Phase 0 and Phase 1 implemented
+on this branch; Phases 2–6 pending. Implemented state is documented in
+[`docs/p2p-model.md`](../p2p-model.md).
 **Branch:** `claude/p2p-car-rental-conversion-yf2a1u`
 **Date:** 2026-07-17
 **Base:** BookCars 8.4.0 fork (backend API, admin panel, frontend, mobile, shared packages)

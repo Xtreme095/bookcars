@@ -4,6 +4,7 @@ import * as bookcarsTypes from ':bookcars-types'
 import * as bookcarsHelper from ':bookcars-helper'
 import { strings as commonStrings } from '@/lang/common'
 import { strings } from '@/lang/cars'
+import { strings as hostStrings } from '@/lang/hosts'
 import env from '@/config/env.config'
 import * as UserService from '@/services/UserService'
 
@@ -798,5 +799,24 @@ export const verifyReCaptcha = async (token: string): Promise<boolean> => {
   } catch (err) {
     error(err)
     return false
+  }
+}
+
+/**
+ * Get host status label.
+ *
+ * @param {bookcarsTypes.HostStatus} status
+ * @returns {string}
+ */
+export const getHostStatusLabel = (status: bookcarsTypes.HostStatus): string => {
+  switch (status) {
+    case bookcarsTypes.HostStatus.Pending:
+      return hostStrings.STATUS_PENDING
+    case bookcarsTypes.HostStatus.Approved:
+      return hostStrings.STATUS_APPROVED
+    case bookcarsTypes.HostStatus.Rejected:
+      return hostStrings.STATUS_REJECTED
+    default:
+      return hostStrings.STATUS_SUSPENDED
   }
 }

@@ -10,6 +10,7 @@ import {
 } from '@mui/icons-material'
 import * as bookcarsTypes from ':bookcars-types'
 import { strings } from '@/lang/footer'
+import { strings as hostStrings } from '@/lang/host'
 import NewsletterForm from '@/components/NewsletterForm'
 import env from '@/config/env.config'
 
@@ -40,6 +41,7 @@ const Footer = () => {
           <ul className="links">
             {!env.HIDE_SUPPLIERS && <li onClick={() => navigate('/suppliers')}>{strings.SUPPLIERS}</li>}
             <li onClick={() => navigate('/locations')}>{strings.LOCATIONS}</li>
+            <li onClick={() => navigate('/become-a-host')}>{hostStrings.BECOME_A_HOST}</li>
           </ul>
         </div>
         <div className="main-section">

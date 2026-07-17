@@ -30,6 +30,7 @@ const SettingForm = ({ settings, onSubmit: onFormSubmit }: SettingFormProps) => 
       setValue('minRentalHours', settings.minRentalHours.toString())
       setValue('minPickupDropoffHour', settings.minPickupDropoffHour.toString())
       setValue('maxPickupDropoffHour', settings.maxPickupDropoffHour.toString())
+      setValue('platformCommissionPct', (settings.platformCommissionPct ?? 35).toString())
     }
   }, [settings, setValue])
 
@@ -40,6 +41,7 @@ const SettingForm = ({ settings, onSubmit: onFormSubmit }: SettingFormProps) => 
         minRentalHours: Number(data.minRentalHours),
         minPickupDropoffHour: Number(data.minPickupDropoffHour),
         maxPickupDropoffHour: Number(data.maxPickupDropoffHour),
+        platformCommissionPct: Number(data.platformCommissionPct),
       }
 
       const { status, data: res } = await SettingService.updateSettings(payload)
@@ -91,6 +93,14 @@ const SettingForm = ({ settings, onSubmit: onFormSubmit }: SettingFormProps) => 
           <Input {...register('maxPickupDropoffHour')} type="text" required autoComplete="off" />
           {errors.maxPickupDropoffHour && (
             <FormHelperText error>{errors.maxPickupDropoffHour.message}</FormHelperText>
+          )}
+        </FormControl>
+
+        <FormControl fullWidth margin="dense">
+          <InputLabel className="required">{strings.PLATFORM_COMMISSION_PCT}</InputLabel>
+          <Input {...register('platformCommissionPct')} type="text" required autoComplete="off" />
+          {errors.platformCommissionPct && (
+            <FormHelperText error>{errors.platformCommissionPct.message}</FormHelperText>
           )}
         </FormControl>
 

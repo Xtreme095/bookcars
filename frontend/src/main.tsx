@@ -4,9 +4,9 @@ import { ToastContainer } from 'react-toastify'
 import { createTheme, ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 
-import { frFR as corefrFR, enUS as coreenUS, esES as coresES } from '@mui/material/locale'
-import { frFR, enUS, esES } from '@mui/x-date-pickers/locales'
-import { frFR as dataGridfrFR, enUS as dataGridenUS, esES as dataGridesEs } from '@mui/x-data-grid/locales'
+import { frFR as corefrFR, enUS as coreenUS, esES as coresES, hrHR as corehrHR } from '@mui/material/locale'
+import { frFR, enUS, esES, hrHR } from '@mui/x-date-pickers/locales'
+import { frFR as dataGridfrFR, enUS as dataGridenUS, esES as dataGridesEs, hrHR as dataGridhrHR } from '@mui/x-data-grid/locales'
 import { disableDevTools } from ':disable-react-devtools'
 import * as helper from '@/utils/helper'
 import * as UserService from '@/services/UserService'
@@ -169,6 +169,7 @@ if (lang) {
 language = UserService.getLanguage()
 const isFr = language === 'fr'
 const isEs = language === 'es'
+const isHr = language === 'hr'
 
 const theme = createTheme(
   {
@@ -251,9 +252,9 @@ const theme = createTheme(
       },
     },
   },
-  isFr ? frFR : isEs ? esES : enUS,
-  isFr ? dataGridfrFR : isEs ? dataGridesEs : dataGridenUS,
-  isFr ? corefrFR : isEs ? coresES : coreenUS,
+  isFr ? frFR : isEs ? esES : isHr ? hrHR : enUS,
+  isFr ? dataGridfrFR : isEs ? dataGridesEs : isHr ? dataGridhrHR : dataGridenUS,
+  isFr ? corefrFR : isEs ? coresES : isHr ? corehrHR : coreenUS,
 )
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

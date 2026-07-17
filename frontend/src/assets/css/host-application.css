@@ -1,0 +1,53 @@
+div.host-application {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+div.host-application .host-application-form {
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+  max-width: 600px;
+  width: 100%;
+}
+
+div.host-application .host-application-form-title {
+  font-size: 1.5em;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+div.host-application .host-application-stepper {
+  margin-bottom: 25px;
+}
+
+div.host-application .step-content {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+div.host-application .documents-info {
+  color: #676767;
+  font-size: 0.9em;
+}
+
+div.host-application .buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+@media only screen and (max-width: 960px) {
+  div.host-application {
+    padding: 0 10px;
+  }
+
+  div.host-application .host-application-form {
+    padding: 20px;
+  }
+}
