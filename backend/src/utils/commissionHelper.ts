@@ -1,3 +1,4 @@
+import { Types } from 'mongoose'
 import * as bookcarsTypes from ':bookcars-types'
 import * as env from '../config/env.config'
 import User from '../models/User'
@@ -192,7 +193,7 @@ export async function calculateSupplierEarnings(
   const result = await CommissionTransaction.aggregate([
     {
       $match: {
-        supplier: supplierId,
+        supplier: new Types.ObjectId(supplierId),
         createdAt: { $gte: fromDate, $lte: toDate },
       },
     },

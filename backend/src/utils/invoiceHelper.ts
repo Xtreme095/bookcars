@@ -66,7 +66,7 @@ export const generateInvoicePDF = async (invoiceData: InvoiceData, outputPath: s
       .text(`Datum izdavanja: ${formatDate(invoiceData.invoiceDate)}`, 50, 105)
       .text(`Datum dospijeća: ${formatDate(invoiceData.dueDate)}`, 50, 120)
 
-    const qrData = `HRVHUB30\nHRK\n${invoiceData.total.toFixed(2)}\n${invoiceData.platformName}\n${invoiceData.platformIban}\n${invoiceData.supplierName}\n${invoiceData.supplierIban}\n${invoiceData.invoiceNumber}`
+    const qrData = `HRVHUB30\nEUR\n${invoiceData.total.toFixed(2)}\n${invoiceData.platformName}\n${invoiceData.platformIban}\n${invoiceData.supplierName}\n${invoiceData.supplierIban}\n${invoiceData.invoiceNumber}`
     const qrCodeDataUrl = await QRCode.toDataURL(qrData, { width: 120, margin: 1 })
     const qrBuffer = Buffer.from(qrCodeDataUrl.split(',')[1], 'base64')
     doc.image(qrBuffer, 450, 50, { width: 100 })

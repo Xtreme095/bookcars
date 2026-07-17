@@ -430,7 +430,7 @@ export const checkout = async (req: Request, res: Response) => {
       await car.save()
 
       // Create commission transaction
-      await createCommissionTransaction(booking, supplier, body.paymentMethod || 'stripe')
+      await createCommissionTransaction(booking, supplier, body.payPal ? 'paypal' : 'stripe')
     }
 
     if (body.payLater || (booking.status === bookcarsTypes.BookingStatus.Paid && body.paymentIntentId && body.customerId)) {

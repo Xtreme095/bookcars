@@ -1081,4 +1081,6 @@ export interface CommissionTransaction extends Document {
   payoutReference?: string
   invoice?: string
   invoiceNumber?: string
+  createdAt: Date
+  updatedAt: Date
 }

@@ -14,6 +14,7 @@ import Country from '../models/Country'
 import ParkingSpot from '../models/ParkingSpot'
 import AdditionalDriver from '../models/AdditionalDriver'
 import BankDetails from '../models/BankDetails'
+import CommissionTransaction from '../models/CommissionTransaction'
 import DateBasedPrice from '../models/DateBasedPrice'
 import * as databaseTTLHelper from './databaseTTLHelper'
 import * as databaseLangHelper from './databaseLangHelper'
@@ -215,6 +216,7 @@ export const models = defineModels([
   BankDetails,
   Booking,
   Car,
+  CommissionTransaction,
   Country,
   DateBasedPrice,
   Location,

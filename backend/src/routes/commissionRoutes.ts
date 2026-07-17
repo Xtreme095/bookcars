@@ -1,6 +1,6 @@
 import express from 'express'
 import * as routeNames from '../config/commissionRoutes.config'
-import * as authJwt from '../middlewares/authJwt'
+import authJwt from '../middlewares/authJwt'
 import * as commissionController from '../controllers/commissionController'
 
 const routes = express.Router()

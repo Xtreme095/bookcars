@@ -489,9 +489,9 @@ export async function generateInvoice(req: Request, res: Response) {
 
       supplierName: supplier.fullName || supplier.companyName || 'N/A',
       supplierOib: supplier.oib || 'N/A',
-      supplierAddress: supplier.address || supplier.companyAddress || 'N/A',
-      supplierCity: supplier.city || supplier.companyCity || 'N/A',
-      supplierZip: supplier.zip || supplier.companyZip || 'N/A',
+      supplierAddress: supplier.companyAddress || 'N/A',
+      supplierCity: supplier.companyCity || 'N/A',
+      supplierZip: supplier.companyZip || 'N/A',
       supplierIban: supplier.iban || 'N/A',
       supplierEmail: supplier.email || 'N/A',
 
@@ -549,9 +549,9 @@ export async function generateInvoice(req: Request, res: Response) {
 
           recipientName: supplier.fullName || supplier.companyName || '',
           recipientOib: supplier.oib || '',
-          recipientAddress: supplier.address || supplier.companyAddress || '',
-          recipientCity: supplier.city || supplier.companyCity || '',
-          recipientZip: supplier.zip || supplier.companyZip || '',
+          recipientAddress: supplier.companyAddress || '',
+          recipientCity: supplier.companyCity || '',
+          recipientZip: supplier.companyZip || '',
           recipientEmail: supplier.email || '',
 
           items: invoiceData.items,
