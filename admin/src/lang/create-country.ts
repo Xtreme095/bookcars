@@ -20,6 +20,12 @@ const strings = new LocalizedStrings({
     INVALID_COUNTRY: 'Este país ya existe.',
     COUNTRY_CREATED: 'País creado con éxito.',
   },
+  hr: {
+    NEW_COUNTRY_HEADING: 'Nova država',
+    COUNTRY_NAME: 'Država',
+    INVALID_COUNTRY: 'Ova država već postoji.',
+    COUNTRY_CREATED: 'Država je uspješno stvorena.',
+  },
 })
 
 langHelper.setLanguage(strings)

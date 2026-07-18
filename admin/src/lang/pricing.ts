@@ -44,6 +44,20 @@ const strings = new LocalizedStrings({
     CONTACT_US: 'Contáctenos',
     FEATURE_5: 'Coches ilimitados en los resultados de búsqueda',
   },
+  hr: {
+    TITLE: 'Cjenovni planovi',
+    FREE_PLAN: 'Besplatni plan',
+    FREE_PLAN_PRICE: 'Besplatno',
+    FEATURE_1: 'Neograničen broj vozila',
+    FEATURE_2: '1 vozilo u rezultatima pretrage',
+    BASIC_PLAN: 'Osnovni plan',
+    BASIC_PLAN_PRICE: '$10/mjesečno',
+    FEATURE_3: '5 vozila u rezultatima pretrage',
+    FEATURE_4: 'Prioritetna podrška',
+    PREMIUM_PLAN: 'Premium plan',
+    CONTACT_US: 'Kontaktirajte nas',
+    FEATURE_5: 'Neograničen broj vozila u rezultatima pretrage',
+  },
 })
 
 langHelper.setLanguage(strings)

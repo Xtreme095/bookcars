@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { fr, enUS, es } from 'date-fns/locale'
+import { fr, enUS, es, hr } from 'date-fns/locale'
 import { Scheduler } from '@/components/scheduler/index'
 import {
   ProcessedEvent,
@@ -135,6 +135,42 @@ const VehicleScheduler = (
       }
     }
 
+    if (_language === 'hr') {
+      return {
+        navigation: {
+          month: 'Mjesec',
+          week: 'Tjedan',
+          day: 'Dan',
+          today: 'Danas',
+          agenda: 'Raspored',
+        },
+        form: {
+          addTitle: 'Dodaj događaj',
+          editTitle: 'Uredi događaj',
+          confirm: 'Potvrdi',
+          delete: 'Izbriši',
+          cancel: 'Odustani',
+        },
+        event: {
+          title: 'Naslov',
+          subtitle: 'Podnaslov',
+          start: 'Početak',
+          end: 'Kraj',
+          allDay: 'Cijeli dan',
+        },
+        validation: {
+          required: 'Obavezno',
+          invalidEmail: 'Nevažeći e-mail',
+          onlyNumbers: 'Dopušteni su samo brojevi',
+          min: 'Najmanje {{min}} slova',
+          max: 'Najviše {{max}} slova',
+        },
+        moreEvents: 'Više...',
+        noDataToDisplay: 'Nema podataka za prikaz',
+        loading: 'Učitavanje...',
+      }
+    }
+
     if (_language === 'es') {
       return {
         navigation: {
@@ -211,7 +247,7 @@ const VehicleScheduler = (
     <Scheduler
       ref={schedulerRef}
       view="month"
-      locale={language === 'fr' ? fr : language === 'es' ? es : enUS}
+      locale={language === 'fr' ? fr : language === 'es' ? es : language === 'hr' ? hr : enUS}
       disableViewer
       editable={false}
       draggable={false}

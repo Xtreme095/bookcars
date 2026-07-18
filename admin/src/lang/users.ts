@@ -11,6 +11,9 @@ const strings = new LocalizedStrings({
   es: {
     NEW_USER: 'Nuevo usuario',
   },
+  hr: {
+    NEW_USER: 'Novi korisnik',
+  },
 })
 
 langHelper.setLanguage(strings)

@@ -34,6 +34,16 @@ const strings = new LocalizedStrings({
     FIND_DEAL: 'Buscar oferta',
     PRICING: 'Precios',
   },
+  hr: {
+    TITLE1: `${env.WEBSITE_NAME} - Vaša usluga najma vozila`,
+    SUBTITLE1: 'Vaš pouzdan partner za najam vozila',
+    CONTENT1: `U ${env.WEBSITE_NAME} razumijemo da je svako putovanje jedinstveno. Posvećeni smo tome da našim korisnicima ponudimo raznolik izbor vozila koja odgovaraju svim potrebama putovanja. Bilo da istražujete grad, putujete poslovno ili tražite avanturu, naše pouzdane usluge najma vozila osiguravaju da vaša avantura počne bez poteškoća. Naša misija je pružiti iznimnu korisničku podršku i učiniti vaše iskustvo ugodnim i bez stresa. S konkurentnim cijenama, raznolikim i dobro održavanim vozilima te predanim timom spremnim pomoći, nastojimo biti vaš pouzdan partner na cesti. Odaberite ${env.WEBSITE_NAME} za sve svoje potrebe najma vozila i doživite slobodu istraživanja vlastitim tempom.`,
+    TITLE2: `Zašto odabrati ${env.WEBSITE_NAME}`,
+    SUBTITLE2: 'Doživite izvrsnost na svakom putovanju',
+    CONTENT2: 'Uživajte u neusporedivoj praktičnosti, pouzdanosti i vrijednosti uz našu uslugu najma vozila. Od jednostavnih rezervacija do vozila visoke kvalitete, mi smo vaš pouzdan partner na putovanjima.',
+    FIND_DEAL: 'Pronađi ponudu',
+    PRICING: 'Cjenik',
+  },
 })
 
 langHelper.setLanguage(strings)

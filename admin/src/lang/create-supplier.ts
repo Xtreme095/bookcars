@@ -21,6 +21,12 @@ const strings = new LocalizedStrings({
     SUPPLIER_IMAGE_SIZE_ERROR: `La imagen debe tener el formato ${env.SUPPLIER_IMAGE_WIDTH}x${env.SUPPLIER_IMAGE_HEIGHT}`,
     RECOMMENDED_IMAGE_SIZE: `Tamaño de imagen recomendado: ${env.SUPPLIER_IMAGE_WIDTH}x${env.SUPPLIER_IMAGE_HEIGHT}`,
   },
+  hr: {
+    CREATE_SUPPLIER_HEADING: 'Novi dobavljač',
+    INVALID_SUPPLIER_NAME: 'Ovaj dobavljač već postoji.',
+    SUPPLIER_IMAGE_SIZE_ERROR: `Slika mora biti u formatu ${env.SUPPLIER_IMAGE_WIDTH}x${env.SUPPLIER_IMAGE_HEIGHT}`,
+    RECOMMENDED_IMAGE_SIZE: `Preporučena veličina slike: ${env.SUPPLIER_IMAGE_WIDTH}x${env.SUPPLIER_IMAGE_HEIGHT}`,
+  },
 })
 
 langHelper.setLanguage(strings)

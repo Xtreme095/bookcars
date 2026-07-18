@@ -20,6 +20,12 @@ const strings = new LocalizedStrings({
     MORE_THAN_FOOR_DOORS: '4+ puertas',
     MORE_THAN_FIVE_SEATS: '5+ asientos',
   },
+  hr: {
+    CAR_SPECS: 'Specifikacije vozila',
+    AIRCON: 'Klima uređaj',
+    MORE_THAN_FOOR_DOORS: '4+ vrata',
+    MORE_THAN_FIVE_SEATS: '5+ sjedala',
+  },
 })
 
 langHelper.setLanguage(strings)

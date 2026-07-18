@@ -14,6 +14,10 @@ const strings = new LocalizedStrings({
     CREATE_USER_HEADING: 'Nuevo usuario',
     BIRTH_DATE: 'Fecha de nacimiento',
   },
+  hr: {
+    CREATE_USER_HEADING: 'Novi korisnik',
+    BIRTH_DATE: 'Datum rođenja',
+  },
 })
 
 langHelper.setLanguage(strings)

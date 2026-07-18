@@ -18,7 +18,7 @@
     "build:ios": "cross-env EAS_NO_VCS=1 npm run ts:build && eas build --profile production --platform ios",
     "build:ios:local": "cross-env EAS_NO_VCS=1 npm run ts:build && eas build --profile production --platform ios --local",
     "build:ios:preview": "cross-env EAS_NO_VCS=1 npm run ts:build && eas build --profile preview --platform android",
-    "lint": "eslint . --cache --cache-location .eslintcache",
+    "lint": "eslint . --cache --cache-location .eslintcache && node ../scripts/check-lang-keys.mjs --files lang",
     "fix": "eslint --fix .",
     "prebuild": "expo prebuild",
     "prebuild:clean": "expo prebuild --clean"

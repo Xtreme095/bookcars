@@ -17,6 +17,11 @@ const strings = new LocalizedStrings({
     TOKEN_EXPIRED: 'Su enlace de activación de cuenta ha expirado.',
     ACTIVATE: 'Activar',
   },
+  hr: {
+    ACTIVATE_HEADING: 'Aktivacija računa',
+    TOKEN_EXPIRED: 'Vaša poveznica za aktivaciju računa je istekla.',
+    ACTIVATE: 'Aktiviraj',
+  },
 })
 
 langHelper.setLanguage(strings)

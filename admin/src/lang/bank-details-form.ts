@@ -26,6 +26,14 @@ const strings = new LocalizedStrings({
     SWIFT_BIC: 'SWIFT/BIC',
     SHOW_BANK_DETAILS_PAGE: 'Mostrar la página de detalles bancarios',
   },
+  hr: {
+    BANK_DETAILS: 'Bankovni podaci',
+    ACCOUNT_HOLDER: 'Vlasnik računa',
+    BANK_NAME: 'Naziv banke',
+    IBAN: 'IBAN',
+    SWIFT_BIC: 'SWIFT/BIC',
+    SHOW_BANK_DETAILS_PAGE: 'Prikaži stranicu s bankovnim podacima',
+  },
 })
 
 langHelper.setLanguage(strings)

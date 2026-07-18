@@ -50,6 +50,22 @@ const strings = new LocalizedStrings({
     DAYS: 'Días',
     COST: 'Coste',
   },
+  hr: {
+    CAR: 'Vozilo',
+    SUPPLIER: 'Dobavljač',
+    DRIVER: 'Vozač',
+    PRICE: 'Cijena',
+    STATUS: 'Status',
+    UPDATE_SELECTION: 'Uredi odabir',
+    DELETE_SELECTION: 'Izbriši odabir',
+    UPDATE_STATUS: 'Izmjena statusa',
+    NEW_STATUS: 'Novi status',
+    DELETE_BOOKING: 'Jeste li sigurni da želite izbrisati ovu rezervaciju?',
+    DELETE_BOOKINGS: 'Jeste li sigurni da želite izbrisati odabrane rezervacije?',
+    EMPTY_LIST: 'Nema rezervacija.',
+    DAYS: 'Dani',
+    COST: 'Ukupno',
+  },
 })
 
 langHelper.setLanguage(strings)

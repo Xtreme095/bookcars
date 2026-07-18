@@ -17,6 +17,11 @@ const strings = new LocalizedStrings({
     VIEW_SUPPLIER: 'Ver perfil del proveedor',
     DELETE_SUPPLIER: '¿Estás seguro de que quieres eliminar este proveedor y todos sus datos?',
   },
+  hr: {
+    EMPTY_LIST: 'Nema dobavljača.',
+    VIEW_SUPPLIER: 'Pogledaj profil dobavljača',
+    DELETE_SUPPLIER: 'Jeste li sigurni da želite izbrisati ovog dobavljača i sve njegove podatke?',
+  },
 })
 
 langHelper.setLanguage(strings)

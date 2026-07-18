@@ -29,6 +29,15 @@ const strings = new LocalizedStrings({
     PARKING_SPOTS: 'Plazas de aparcamiento',
     PARENT_LOCATION: 'Ubicación de los Padres',
   },
+  hr: {
+    NEW_LOCATION_HEADING: 'Nova lokacija',
+    LOCATION_NAME: 'Lokacija',
+    INVALID_LOCATION: 'Ova lokacija već postoji.',
+    LOCATION_CREATED: 'Lokacija je uspješno stvorena.',
+    COUNTRY: 'Država',
+    PARKING_SPOTS: 'Parkirna mjesta',
+    PARENT_LOCATION: 'Nadređena lokacija',
+  },
 })
 
 langHelper.setLanguage(strings)

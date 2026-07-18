@@ -20,6 +20,12 @@ const strings = new LocalizedStrings({
     DAILY_PRICE: 'Precio diario',
     NEW_DATE_BASED_PRICE: 'Nuevo precio por fecha',
   },
+  hr: {
+    START_DATE: 'Datum početka',
+    END_DATE: 'Datum završetka',
+    DAILY_PRICE: 'Cijena po danu',
+    NEW_DATE_BASED_PRICE: 'Nova cijena po datumu',
+  },
 })
 
 langHelper.setLanguage(strings)

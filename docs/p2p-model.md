@@ -349,5 +349,19 @@ webhook applies the final decision through the same review endpoint logic.
 - Backend emails: en/fr/es/hr (recipient's stored language).
 - Frontend and mobile: Croatian (`hr`) is registered and selectable; all frontend
   lang files carry hr blocks; date-fns/MUI locales wired for hr.
-- Admin: new host pages ship en/fr/es/hr; the full admin Croatian backfill is
-  scheduled for Phase 6 (until then `hr` is not selectable in the admin panel).
+- Admin (Phase 6): full Croatian backfill across all admin lang files; `hr` is
+  registered in the admin language switcher; date-fns/MUI/scheduler locales wired.
+- Guardrail: `scripts/check-lang-keys.mjs` runs as part of `npm run lint` in all
+  four workspaces and fails when any language is missing keys (LocalizedStrings
+  blocks in admin/frontend, per-language files in backend/mobile).
+
+## Mobile app (v1 decision — Phase 6)
+
+The mobile app stays **renter-only** in v1; the host portal and the admin panel
+are web-only. Mobile renters can browse and book classic supplier cars
+unchanged. Host cars appear in mobile search results, but booking one requires
+an approved identity verification, and the verification upload UI currently
+ships only in the web frontend (Settings → Identity verification) — the API
+rejects an unverified host-car checkout with "Renter verification required".
+Renters who verified on the web can book host cars from mobile normally. A
+native verification screen (and host features, if ever) are future work.

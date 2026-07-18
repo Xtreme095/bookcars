@@ -26,6 +26,14 @@ const strings = new LocalizedStrings({
     RESET_PASSWORD: '¿Olvidaste tu contraseña?',
     STAY_CONNECTED: 'Mantenerse conectado',
   },
+  hr: {
+    SIGN_IN_HEADING: 'Prijava',
+    SIGN_IN: 'Prijavi se',
+    ERROR_IN_SIGN_IN: 'Netočna adresa e-pošte ili lozinka.',
+    IS_BLACKLISTED: 'Vaš račun je suspendiran.',
+    RESET_PASSWORD: 'Zaboravili ste lozinku?',
+    STAY_CONNECTED: 'Ostani prijavljen',
+  },
 })
 
 langHelper.setLanguage(strings)

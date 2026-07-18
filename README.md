@@ -36,6 +36,19 @@ The admin panel allows admins to manage suppliers, cars, countries, locations, p
 
 Customers can register through the web frontend or mobile app, search for available cars based on pickup and drop-off points and time, choose a car and complete the checkout process in a few clicks.
 
+### Peer-to-peer (P2P) extension
+
+This fork extends BookCars into a peer-to-peer car-sharing platform for the Croatian market: the operating company remains the legal rental operator, while private car owners ("hosts") apply from the frontend, lease their vehicles to the platform and receive a revenue share.
+
+* Host self-service onboarding (personal data, IBAN, OIB, ID documents) with an admin approval queue
+* Host vehicle listings (photos, registration document, price, availability calendar, min/max rental days) with per-vehicle admin review (draft → pending review → active → suspended)
+* Configurable revenue share (global default + per-host override), a commission ledger per completed booking, monthly payout statements (PDF, HR/EN) with guaranteed monthly minimums, and a SEPA-compatible payout CSV export
+* Rental agreement PDF (HR/EN) generated on each confirmed booking, attached to the confirmation email and downloadable by renter and admin
+* Renter identity verification (driver's license + ID upload, manual admin review, pluggable KYC provider interface) required before booking a host car
+* Croatian (hr) localization across backend emails, frontend, admin panel and mobile app
+
+See [docs/p2p-model.md](docs/p2p-model.md) for the data model and flows, and [docs/p2p/PLAN.md](docs/p2p/PLAN.md) for the conversion plan. Deployment notes: run `backend/scripts/migrate-p2p.ts` once after upgrading, and set the new `BC_CDN_HOST_DOCUMENTS`, `BC_CDN_TEMP_HOST_DOCUMENTS`, `BC_CDN_STATEMENTS`, `BC_CDN_AGREEMENTS`, `BC_PLATFORM_*` and `BC_VERIFICATION_PROVIDER` environment variables (see `backend/.env.example`).
+
 ## Quick Links
 * [Overview](https://github.com/aelassas/bookcars/wiki/Overview)  
 * [Install Guide (Self-hosted)](https://github.com/aelassas/bookcars/wiki/Installing-(Self%E2%80%90hosted))
