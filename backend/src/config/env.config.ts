@@ -346,6 +346,26 @@ export const CDN_HOST_DOCUMENTS = __env__('BC_CDN_HOST_DOCUMENTS', false, '/var/
 export const CDN_TEMP_HOST_DOCUMENTS = __env__('BC_CDN_TEMP_HOST_DOCUMENTS', false, '/var/www/private/bookcars/temp/host-documents')
 
 /**
+ * Platform legal identity (P2P) — the operating company acting as merchant
+ * of record. Used on payout statements, invoices and rental agreements.
+ */
+export const PLATFORM_NAME = __env__('BC_PLATFORM_NAME', false, 'BookCars')
+export const PLATFORM_OIB = __env__('BC_PLATFORM_OIB', false)
+export const PLATFORM_ADDRESS = __env__('BC_PLATFORM_ADDRESS', false)
+export const PLATFORM_CITY = __env__('BC_PLATFORM_CITY', false)
+export const PLATFORM_ZIP = __env__('BC_PLATFORM_ZIP', false)
+export const PLATFORM_IBAN = __env__('BC_PLATFORM_IBAN', false)
+export const PLATFORM_EMAIL = __env__('BC_PLATFORM_EMAIL', false)
+
+/**
+ * Payout statements' folder path (P2P). Private — streamed through an
+ * authenticated endpoint (owning host or admin only).
+ *
+ * @type {string}
+ */
+export const CDN_STATEMENTS = __env__('BC_CDN_STATEMENTS', false, '/var/www/private/bookcars/statements')
+
+/**
  * Admin host.
  *
  * @type {string}
@@ -1159,12 +1179,42 @@ export interface CommissionTransaction extends Document {
   netRevenue: number
   pdvRate: number
   pdvAmount: number
-  payoutStatus: 'pending' | 'processing' | 'paid' | 'failed'
+  payoutStatus: 'pending' | 'processing' | 'paid' | 'failed' | 'voided'
   payoutDate?: Date
   payoutMethod: 'bank_transfer' | 'hold' | 'manual'
   payoutReference?: string
   invoice?: string
   invoiceNumber?: string
+  hostCar?: boolean
+  payout?: Types.ObjectId
+  createdAt: Date
+  updatedAt: Date
+}
+
+/**
+ * Payout Document (P2P) — monthly payout statement per host.
+ *
+ * @export
+ * @interface Payout
+ * @typedef {Payout}
+ * @extends {Document}
+ */
+export interface Payout extends Document {
+  host: Types.ObjectId
+  year: number
+  month: number
+  entries: Types.ObjectId[]
+  bookingsCount: number
+  grossTotal: number
+  commissionTotal: number
+  shareTotal: number
+  guaranteedMinimum: number
+  amount: number
+  currency: string
+  status: bookcarsTypes.PayoutStatus
+  paidAt?: Date
+  reference?: string
+  statementFile?: string
   createdAt: Date
   updatedAt: Date
 }

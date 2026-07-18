@@ -13,6 +13,7 @@ import Token, { TOKEN_EXPIRE_AT_INDEX_NAME } from '../models/Token'
 import User, { USER_EXPIRE_AT_INDEX_NAME } from '../models/User'
 import Country from '../models/Country'
 import ParkingSpot from '../models/ParkingSpot'
+import Payout from '../models/Payout'
 import AdditionalDriver from '../models/AdditionalDriver'
 import BankDetails from '../models/BankDetails'
 import CommissionTransaction from '../models/CommissionTransaction'
@@ -226,6 +227,7 @@ export const models = defineModels([
   Notification,
   NotificationCounter,
   ParkingSpot,
+  Payout,
   PushToken,
   Token,
   User,

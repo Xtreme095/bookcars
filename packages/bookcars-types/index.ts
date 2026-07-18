@@ -658,6 +658,39 @@ export interface GetHostCarsBody {
   statuses?: CarStatus[]
 }
 
+export enum PayoutStatus {
+  Pending = 'pending',
+  Paid = 'paid',
+}
+
+export interface Payout {
+  _id: string
+  host: User | string
+  year: number
+  month: number
+  bookingsCount: number
+  grossTotal: number
+  commissionTotal: number
+  shareTotal: number
+  guaranteedMinimum: number
+  amount: number
+  currency: string
+  status: PayoutStatus
+  paidAt?: Date
+  reference?: string
+  statementFile?: string
+}
+
+export interface GetPayoutsBody {
+  year: number
+  month: number
+  statuses?: PayoutStatus[]
+}
+
+export interface MarkPayoutPaidPayload {
+  reference?: string
+}
+
 export interface Data<T> {
   rows: T[]
   rowCount: number

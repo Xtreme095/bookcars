@@ -23,6 +23,7 @@ import settingRoutes from './routes/settingRoutes'
 import commissionRoutes from './routes/commissionRoutes'
 import hostRoutes from './routes/hostRoutes'
 import hostCarRoutes from './routes/hostCarRoutes'
+import payoutRoutes from './routes/payoutRoutes'
 import * as helper from './utils/helper'
 
 const app = express()
@@ -70,6 +71,7 @@ app.use('/', settingRoutes)
 app.use('/', commissionRoutes)
 app.use('/', hostRoutes)
 app.use('/', hostCarRoutes)
+app.use('/', payoutRoutes)
 
 if (env.ENABLE_SENTRY) {
   Sentry.setupExpressErrorHandler(app)
@@ -90,5 +92,6 @@ await helper.mkdir(env.CDN_TEMP_LICENSES)
 // Host identity documents live outside the public CDN root (streamed via authenticated endpoint)
 await helper.mkdir(env.CDN_HOST_DOCUMENTS)
 await helper.mkdir(env.CDN_TEMP_HOST_DOCUMENTS)
+await helper.mkdir(env.CDN_STATEMENTS)
 
 export default app

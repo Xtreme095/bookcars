@@ -70,7 +70,7 @@ const commissionTransactionSchema = new Schema<env.CommissionTransaction>(
     // Payout tracking
     payoutStatus: {
       type: String,
-      enum: ['pending', 'processing', 'paid', 'failed'],
+      enum: ['pending', 'processing', 'paid', 'failed', 'voided'],
       required: [true, "can't be blank"],
       default: 'pending',
       index: true,
@@ -97,6 +97,20 @@ const commissionTransactionSchema = new Schema<env.CommissionTransaction>(
     invoiceNumber: {
       type: String,
       trim: true,
+      index: true,
+    },
+
+    // P2P
+    hostCar: {
+      // whether the booked car was host-listed (revenue share applies)
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    payout: {
+      // the monthly payout this entry was settled in
+      type: Schema.Types.ObjectId,
+      ref: 'Payout',
       index: true,
     },
   },

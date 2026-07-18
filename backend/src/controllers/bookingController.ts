@@ -17,83 +17,13 @@ import Notification from '../models/Notification'
 import NotificationCounter from '../models/NotificationCounter'
 import PushToken from '../models/PushToken'
 import AdditionalDriver from '../models/AdditionalDriver'
-import CommissionTransaction from '../models/CommissionTransaction'
 import * as helper from '../utils/helper'
 import * as mailHelper from '../utils/mailHelper'
-import * as commissionHelper from '../utils/commissionHelper'
+import * as ledgerHelper from '../utils/ledgerHelper'
+import * as priceHelper from '../utils/priceHelper'
 import * as env from '../config/env.config'
 import * as logger from '../utils/logger'
 import stripeAPI from '../payment/stripe'
-
-/**
- * Create commission transaction for a paid booking.
- *
- * @async
- * @param {env.Booking} booking
- * @param {env.User} supplier
- * @param {string} paymentMethod
- * @returns {Promise<void>}
- */
-const createCommissionTransaction = async (
-  booking: env.Booking,
-  supplier: env.User,
-  paymentMethod: string = 'stripe',
-): Promise<void> => {
-  try {
-    // Calculate commission
-    const calculation = await commissionHelper.calculateCommission(supplier, booking.price, paymentMethod)
-
-    // Generate invoice number
-    const invoiceNumber = await commissionHelper.generateInvoiceNumber()
-
-    // Create commission transaction
-    const commissionTransaction = new CommissionTransaction({
-      booking: booking._id,
-      supplier: supplier._id,
-      totalBookingAmount: booking.price,
-      supplierEarnings: calculation.supplierEarnings,
-      platformCommission: calculation.platformCommission,
-      commissionType: calculation.commissionType,
-      commissionValue: calculation.commissionRate,
-      paymentGatewayFee: calculation.paymentGatewayFee,
-      netRevenue: calculation.netRevenue,
-      pdvRate: calculation.pdvRate,
-      pdvAmount: calculation.pdvAmount,
-      payoutStatus: 'pending',
-      payoutMethod: 'bank_transfer',
-      invoiceNumber,
-    })
-
-    await commissionTransaction.save()
-
-    // Update supplier's financial tracking
-    await User.findByIdAndUpdate(supplier._id, {
-      $inc: {
-        totalRevenue: calculation.supplierEarnings,
-        currentMonthBookings: 1,
-        pendingPayout: calculation.supplierEarnings,
-      },
-    })
-
-    // Check for tier upgrade
-    const tierUpgrade = await commissionHelper.checkTierUpgrade(supplier._id.toString())
-    if (tierUpgrade) {
-      await User.findByIdAndUpdate(supplier._id, {
-        tier: tierUpgrade.newTier,
-        tierCommissionRate: tierUpgrade.newCommissionRate,
-      })
-
-      logger.info(`Supplier ${supplier._id} upgraded from ${tierUpgrade.oldTier} to ${tierUpgrade.newTier}`)
-
-      // TODO: Send tier upgrade notification email to supplier
-    }
-
-    logger.info(`Commission transaction created for booking ${booking._id}`)
-  } catch (err) {
-    logger.error(`[bookingController.createCommissionTransaction] Error creating commission for booking ${booking._id}: ${err}`)
-    // Don't throw error - booking should still succeed even if commission fails
-  }
-}
 
 /**
  * Create a Booking.
@@ -279,7 +209,7 @@ export const checkout = async (req: Request, res: Response) => {
     }
 
     // P2P booking guards: the car must be live and the rental window bookable
-    const bookingCar = await Car.findById(body.booking.car)
+    const bookingCar = await Car.findById(body.booking.car).populate<{ dateBasedPrices: env.DateBasedPrice[] }>('dateBasedPrices')
     if (!bookingCar) {
       throw new Error(`Car ${body.booking.car} not found`)
     }
@@ -325,6 +255,28 @@ export const checkout = async (req: Request, res: Response) => {
         res.status(400).send('Car is already booked during the requested period')
         return
       }
+    }
+
+    // server-side price verification — never trust the client-sent price
+    const expectedPrice = priceHelper.calculateTotalPrice(
+      bookingCar as unknown as env.Car,
+      bookingCar.dateBasedPrices || [],
+      bookingFrom,
+      bookingTo,
+      supplier.priceChangeRate || 0,
+      {
+        cancellation: body.booking.cancellation,
+        amendments: body.booking.amendments,
+        theftProtection: body.booking.theftProtection,
+        collisionDamageWaiver: body.booking.collisionDamageWaiver,
+        fullInsurance: body.booking.fullInsurance,
+        additionalDriver: body.booking.additionalDriver,
+      },
+    )
+    if (!priceHelper.priceMatches(body.booking.price!, expectedPrice)) {
+      logger.error(`[booking.checkout] Price mismatch for car ${bookingCar._id.toString()}: client ${body.booking.price}, expected ${expectedPrice}`)
+      res.status(400).send('Booking price is not valid')
+      return
     }
 
     if (driver) {
@@ -479,8 +431,8 @@ export const checkout = async (req: Request, res: Response) => {
       car.trips += 1
       await car.save()
 
-      // Create commission transaction
-      await createCommissionTransaction(booking, supplier, body.payPal ? 'paypal' : 'stripe')
+      // Revenue-share ledger entry (P2P)
+      await ledgerHelper.ensureLedgerEntry(booking._id.toString())
     }
 
     if (body.payLater || (booking.status === bookcarsTypes.BookingStatus.Paid && body.paymentIntentId && body.customerId)) {
@@ -736,6 +688,9 @@ export const update = async (req: Request, res: Response) => {
       await booking.save()
 
       if (previousStatus !== status) {
+        // revenue-share ledger transition (P2P)
+        await ledgerHelper.onBookingStatusChange(booking._id.toString(), previousStatus, status)
+
         // notify driver
         await notifyDriver(booking)
       }
@@ -774,6 +729,8 @@ export const updateStatus = async (req: Request, res: Response) => {
 
     for (const booking of bookings) {
       if (booking.status !== status) {
+        // revenue-share ledger transition (P2P)
+        await ledgerHelper.onBookingStatusChange(booking._id.toString(), booking.status, status as bookcarsTypes.BookingStatus)
         await notifyDriver(booking)
       }
     }

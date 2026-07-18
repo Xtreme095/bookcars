@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import Stripe from 'stripe'
 import i18n from '../lang/i18n'
 import * as logger from '../utils/logger'
+import * as ledgerHelper from '../utils/ledgerHelper'
 import * as bookcarsTypes from ':bookcars-types'
 import * as env from '../config/env.config'
 import * as helper from '../utils/helper'
@@ -141,6 +142,9 @@ export const checkCheckoutSession = async (req: Request, res: Response) => {
       booking.status = status
 
       await booking.save()
+
+      // revenue-share ledger entry (P2P)
+      await ledgerHelper.ensureLedgerEntry(booking._id.toString())
 
       const car = await Car.findById(booking.car)
       if (!car) {
