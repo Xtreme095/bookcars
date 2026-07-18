@@ -390,12 +390,16 @@ const Car = ({
         <View style={styles.footer}>
           <View style={styles.detailsContainer}>
             <View style={styles.supplier}>
-              <Image
-                style={styles.supplierImg}
-                source={{
-                  uri: bookcarsHelper.joinURL(env.CDN_USERS, car.supplier.avatar),
-                }}
-              />
+              {car.supplier.avatar ? (
+                <Image
+                  style={styles.supplierImg}
+                  source={{
+                    uri: bookcarsHelper.joinURL(env.CDN_USERS, car.supplier.avatar),
+                  }}
+                />
+              ) : (
+                <MaterialIcons name="account-circle" size={env.SUPPLIER_IMAGE_HEIGHT} color="#bdbdbd" />
+              )}
               <Text style={styles.supplierText} numberOfLines={2} ellipsizeMode="tail">{car.supplier.fullName}</Text>
             </View>
             <View style={styles.details}>

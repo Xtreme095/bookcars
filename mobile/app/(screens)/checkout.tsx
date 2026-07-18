@@ -970,12 +970,16 @@ const CheckoutScreen = () => {
 
                     <Text style={styles.detailTitle}>{i18n.t('SUPPLIER')}</Text>
                     <View style={styles.supplier}>
-                      <Image
-                        style={styles.supplierImg}
-                        source={{
-                          uri: bookcarsHelper.joinURL(env.CDN_USERS, __car.supplier.avatar),
-                        }}
-                      />
+                      {__car.supplier.avatar ? (
+                        <Image
+                          style={styles.supplierImg}
+                          source={{
+                            uri: bookcarsHelper.joinURL(env.CDN_USERS, __car.supplier.avatar),
+                          }}
+                        />
+                      ) : (
+                        <MaterialIcons name="account-circle" size={env.SUPPLIER_IMAGE_HEIGHT} color="#bdbdbd" />
+                      )}
                       <Text style={styles.supplierText} numberOfLines={2} ellipsizeMode="tail">{__car.supplier.fullName}</Text>
                     </View>
 

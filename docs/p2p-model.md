@@ -355,6 +355,15 @@ webhook applies the final decision through the same review endpoint logic.
   four workspaces and fails when any language is missing keys (LocalizedStrings
   blocks in admin/frontend, per-language files in backend/mobile).
 
+## Public host visibility
+
+Hosts appear **publicly** with their profile name and photo (Turo-style)
+wherever a supplier is shown to renters: search results and the supplier
+filter, the public suppliers page and homepage carrousel, checkout and
+booking views — on web and mobile. A neutral default avatar is rendered when
+the host has not uploaded a photo (hosts manage their photo in Settings, and
+the application wizard informs them their name and photo will be public).
+
 ## Pay-at-host (host cars)
 
 At checkout (web and mobile), host cars replace the generic pay-later option

@@ -73,9 +73,8 @@ an owner action, an infrastructure step, or a business/legal prerequisite.
 - **Mobile is renter-complete** (2026-07-18): verification upload, host-car
   booking and pay-at-host all work in the mobile app; the host portal and
   admin panel remain web-only.
-
-## Open product question
-
-- **Host public visibility** — hosts currently appear like suppliers (name +
-  avatar) in search results and filters. Decide whether host cars should
-  instead appear under the platform brand only.
+- **Hosts appear publicly** (2026-07-18): host cars show the host's profile
+  name and photo in search results, filters, checkout and bookings
+  (Turo-style), with a neutral default avatar when no photo is uploaded. The
+  host application wizard tells applicants their name and photo will be shown
+  publicly; hosts manage the photo in Settings.

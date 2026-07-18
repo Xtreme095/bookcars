@@ -7,6 +7,16 @@ import { strings as hostCarsStrings } from '@/lang/host-cars'
 import env from '@/config/env.config'
 import * as PaymentService from '@/services/PaymentService'
 import * as UserService from '@/services/UserService'
+import DefaultAvatar from '@/assets/img/default-avatar.svg'
+
+/**
+ * Get a user avatar URL, falling back to the default avatar
+ * (hosts are self-registered and may not have uploaded a photo).
+ *
+ * @param {?string} [avatar]
+ * @returns {string}
+ */
+export const avatarUrl = (avatar?: string | null) => (avatar ? bookcarsHelper.joinURL(env.CDN_USERS, avatar) : DefaultAvatar)
 
 /**
  * Get language.

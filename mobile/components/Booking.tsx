@@ -102,12 +102,16 @@ const Booking = ({
 
         <Text style={styles.detailTitle}>{i18n.t('SUPPLIER')}</Text>
         <View style={styles.supplier}>
-          <Image
-            style={styles.supplierImg}
-            source={{
-              uri: bookcarsHelper.joinURL(env.CDN_USERS, supplier.avatar),
-            }}
-          />
+          {supplier.avatar ? (
+            <Image
+              style={styles.supplierImg}
+              source={{
+                uri: bookcarsHelper.joinURL(env.CDN_USERS, supplier.avatar),
+              }}
+            />
+          ) : (
+            <MaterialIcons name="account-circle" size={env.SUPPLIER_IMAGE_HEIGHT} color="#bdbdbd" />
+          )}
           <Text style={styles.supplierText}>{supplier.fullName}</Text>
         </View>
 

@@ -216,6 +216,7 @@ const HostApplication = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         {activeStep === 0 && (
           <div className="step-content">
+            <p className="documents-info">{strings.PUBLIC_PROFILE_INFO}</p>
             <FormControl fullWidth margin="dense">
               <TextField
                 label={strings.ADDRESS}

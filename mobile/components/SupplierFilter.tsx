@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
+import { MaterialIcons } from '@expo/vector-icons'
 import * as bookcarsTypes from ':bookcars-types'
 import * as bookcarsHelper from ':bookcars-helper'
 
@@ -67,12 +68,16 @@ const SupplierFilter = ({
                     }}
                   >
                     <View style={styles.item}>
-                      <Image
-                        style={styles.image}
-                        source={{
-                          uri: bookcarsHelper.joinURL(env.CDN_USERS, supplier.avatar),
-                        }}
-                      />
+                      {supplier.avatar ? (
+                        <Image
+                          style={styles.image}
+                          source={{
+                            uri: bookcarsHelper.joinURL(env.CDN_USERS, supplier.avatar),
+                          }}
+                        />
+                      ) : (
+                        <MaterialIcons style={styles.image} name="account-circle" size={env.SUPPLIER_IMAGE_HEIGHT} color="#bdbdbd" />
+                      )}
                       {supplier.carCount && <Text style={styles.text}>{`(${supplier.carCount})`}</Text>}
                     </View>
                   </Switch>
