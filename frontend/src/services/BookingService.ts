@@ -102,3 +102,17 @@ export const getBookingId = (sessionId: string): Promise<string> =>
       { withCredentials: true }
     )
     .then((res) => res.data)
+
+/**
+ * Download the rental agreement PDF of a booking.
+ *
+ * @param {string} id
+ * @returns {Promise<Blob>}
+ */
+export const getAgreement = (id: string): Promise<Blob> =>
+  axiosInstance
+    .get(
+      `/api/booking-agreement/${encodeURIComponent(id)}`,
+      { withCredentials: true, responseType: 'blob' }
+    )
+    .then((res) => res.data)

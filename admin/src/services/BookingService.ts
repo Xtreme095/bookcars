@@ -92,3 +92,32 @@ export const getBookings = (payload: bookcarsTypes.GetBookingsPayload, page: num
       { withCredentials: true }
     )
     .then((res) => res.data)
+
+/**
+ * Download the rental agreement PDF of a booking.
+ *
+ * @param {string} id
+ * @returns {Promise<Blob>}
+ */
+export const getAgreement = (id: string): Promise<Blob> =>
+  axiosInstance
+    .get(
+      `/api/booking-agreement/${encodeURIComponent(id)}`,
+      { withCredentials: true, responseType: 'blob' }
+    )
+    .then((res) => res.data)
+
+/**
+ * Regenerate the rental agreement PDF of a booking.
+ *
+ * @param {string} id
+ * @returns {Promise<import(':bookcars-types').BookingAgreement>}
+ */
+export const regenerateAgreement = (id: string): Promise<bookcarsTypes.BookingAgreement> =>
+  axiosInstance
+    .post(
+      `/api/regenerate-agreement/${encodeURIComponent(id)}`,
+      null,
+      { withCredentials: true }
+    )
+    .then((res) => res.data)

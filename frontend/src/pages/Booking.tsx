@@ -12,6 +12,7 @@ import { strings as commonStrings } from '@/lang/common'
 import { strings as blStrings } from '@/lang/booking-list'
 import { strings as bfStrings } from '@/lang/booking-filter'
 import { strings as csStrings } from '@/lang/cars'
+import { strings as bkStrings } from '@/lang/booking'
 import env from '@/config/env.config'
 import * as helper from '@/utils/helper'
 import Layout from '@/components/Layout'
@@ -493,13 +494,35 @@ const Booking = () => {
               </FormControl>
 
               <div>
-                {edit && (
-                  <div className="booking-buttons">
+                <div className="booking-buttons">
+                  {edit && (
                     <Button variant="contained" className="btn-primary btn-margin-bottom" type="submit">
                       {commonStrings.SAVE}
                     </Button>
-                  </div>
-                )}
+                  )}
+                  {booking.agreement?.file && (
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      className="btn-margin-bottom"
+                      onClick={async () => {
+                        try {
+                          const blob = await BookingService.getAgreement(booking._id as string)
+                          const url = URL.createObjectURL(blob)
+                          const link = document.createElement('a')
+                          link.href = url
+                          link.download = `rental-agreement-${booking._id}.pdf`
+                          link.click()
+                          URL.revokeObjectURL(url)
+                        } catch (err) {
+                          helper.error(err)
+                        }
+                      }}
+                    >
+                      {bkStrings.RENTAL_AGREEMENT}
+                    </Button>
+                  )}
+                </div>
               </div>
             </form>
           </div>

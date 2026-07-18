@@ -273,10 +273,25 @@ minimum. Regeneration is idempotent while pending and never touches paid payouts
 `env.config.ts`) identify the operating company on statements — and later on
 rental agreements (Phase 4).
 
-## Rental agreements *(planned — Phase 4)*
+## Rental agreements (Phase 4 — implemented)
 
-- PDF generated on booking confirmation (pdfkit, HR/EN templates), stored with the
-  booking, downloadable by admin and renter; platform named as lessor.
+- `Booking.agreement { file, language, generatedAt }`; PDFs stored privately
+  (`BC_CDN_AGREEMENTS`) and streamed via `GET /api/booking-agreement/:id`
+  (admin, renter, or booking supplier). `POST /api/regenerate-agreement/:id`
+  (admin) rebuilds it.
+- Generated automatically on every confirmation path — checkout (pay-later and
+  paid), Stripe session confirmation, PayPal capture, and admin status
+  transitions into paid/paidInFull/deposit/reserved; regenerated when an admin
+  edits a confirmed booking so the PDF always matches the booking.
+- Croatian or English template by the renter's stored language (DejaVu Sans for
+  diacritics): the **platform is the lessor** (hosts lease vehicles to the
+  platform and are not a party to the renter agreement), renter data and
+  additional driver, vehicle identity and plate, rental period with localized
+  location names and timezone, price/deposit/options, payment state, standard
+  terms, signature blocks.
+- Attached to the booking confirmation email alongside the supplier contract.
+- Download buttons: frontend Booking page (renter) and admin Update Booking
+  (download + regenerate).
 
 ## Renter verification *(planned — Phase 5)*
 

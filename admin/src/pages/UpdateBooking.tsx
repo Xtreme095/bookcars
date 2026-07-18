@@ -221,6 +221,42 @@ const UpdateBooking = () => {
     }
   }
 
+  const handleDownloadAgreement = async () => {
+    try {
+      if (!booking) {
+        return
+      }
+      const blob = await BookingService.getAgreement(booking._id as string)
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `rental-agreement-${booking._id}.pdf`
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch (err) {
+      helper.error(err)
+    }
+  }
+
+  const handleRegenerateAgreement = async () => {
+    try {
+      if (!booking) {
+        return
+      }
+      const agreement = await BookingService.regenerateAgreement(booking._id as string)
+      if (agreement?.file) {
+        const _booking = bookcarsHelper.clone(booking) as bookcarsTypes.Booking
+        _booking.agreement = agreement
+        setBooking(_booking)
+        helper.info(strings.AGREEMENT_REGENERATED)
+      } else {
+        helper.error()
+      }
+    } catch (err) {
+      helper.error(err)
+    }
+  }
+
   const handleDelete = () => {
     setOpenDeleteDialog(true)
   }
@@ -855,6 +891,16 @@ const UpdateBooking = () => {
                   <Button variant="contained" className="btn-primary btn-margin-bottom" size="small" type="submit" disabled={isSubmitting}>
                     {commonStrings.SAVE}
                   </Button>
+                  {booking?.agreement?.file && (
+                    <Button variant="outlined" color="primary" className="btn-margin-bottom" size="small" onClick={handleDownloadAgreement}>
+                      {strings.RENTAL_AGREEMENT}
+                    </Button>
+                  )}
+                  {booking && (
+                    <Button variant="outlined" color="primary" className="btn-margin-bottom" size="small" onClick={handleRegenerateAgreement}>
+                      {strings.REGENERATE_AGREEMENT}
+                    </Button>
+                  )}
                   <Button variant="contained" className="btn-margin-bottom" color="error" size="small" onClick={handleDelete}>
                     {commonStrings.DELETE}
                   </Button>
