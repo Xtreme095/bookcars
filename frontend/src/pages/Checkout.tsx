@@ -850,7 +850,7 @@ const Checkout = () => {
                               setValue('payInFull', e.target.value === 'payInFull')
                             }}
                           >
-                            {car.supplier.payLater && (
+                            {(car.hostCar || car.supplier.payLater) && (
                               <FormControlLabel
                                 value="payLater"
                                 control={<Radio />}
@@ -858,8 +858,8 @@ const Checkout = () => {
                                 className={clientSecret || payPalLoaded ? 'payment-radio-disabled' : ''}
                                 label={(
                                   <span className="payment-button">
-                                    <span>{strings.PAY_LATER}</span>
-                                    <span className="payment-info">{strings.PAY_LATER_INFO}</span>
+                                    <span>{car.hostCar ? strings.PAY_AT_HOST : strings.PAY_LATER}</span>
+                                    <span className="payment-info">{car.hostCar ? strings.PAY_AT_HOST_INFO : strings.PAY_LATER_INFO}</span>
                                   </span>
                                 )}
                               />
@@ -955,7 +955,7 @@ const Checkout = () => {
                       </div>
                     </div>
 
-                    {(!car.supplier.payLater || !payLater) && (
+                    {(!(car.hostCar || car.supplier.payLater) || !payLater) && (
                       env.PAYMENT_GATEWAY === bookcarsTypes.PaymentGateway.Stripe
                         ? (
                           clientSecret && (
