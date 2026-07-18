@@ -366,6 +366,14 @@ export const PLATFORM_EMAIL = __env__('BC_PLATFORM_EMAIL', false)
 export const CDN_STATEMENTS = __env__('BC_CDN_STATEMENTS', false, '/var/www/private/bookcars/statements')
 
 /**
+ * Rental agreements' folder path (P2P). Private — streamed through an
+ * authenticated endpoint (renter, booking supplier or admin only).
+ *
+ * @type {string}
+ */
+export const CDN_AGREEMENTS = __env__('BC_CDN_AGREEMENTS', false, '/var/www/private/bookcars/agreements')
+
+/**
  * Admin host.
  *
  * @type {string}
@@ -726,6 +734,12 @@ export interface AdditionalDriver {
  * @typedef {Booking}
  * @extends {Document}
  */
+export interface BookingAgreement {
+  file: string
+  language?: string
+  generatedAt?: Date
+}
+
 export interface Booking extends Document {
   _id: Types.ObjectId
   supplier: Types.ObjectId
@@ -752,6 +766,7 @@ export interface Booking extends Document {
   isDeposit: boolean
   isPayedInFull?: boolean
   paypalOrderId?: string
+  agreement?: BookingAgreement
 }
 
 /**

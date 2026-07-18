@@ -1,8 +1,7 @@
-import path from 'node:path'
 import PDFDocument from 'pdfkit'
 import fs from 'node:fs'
 import * as env from '../config/env.config'
-import * as helper from './helper'
+import * as pdfFonts from './pdfFonts'
 
 /**
  * Monthly payout statement PDF (P2P), in Croatian or English.
@@ -131,10 +130,6 @@ export interface StatementData {
   amount: number
 }
 
-const FONT_DIR = path.join(process.cwd(), 'src', 'assets', 'fonts')
-const FONT_REGULAR = path.join(FONT_DIR, 'DejaVuSans.ttf')
-const FONT_BOLD = path.join(FONT_DIR, 'DejaVuSans-Bold.ttf')
-
 const eur = (value: number) => `${value.toFixed(2)} €`
 const dateStr = (date: Date) => {
   const d = new Date(date)
@@ -152,11 +147,9 @@ const dateStr = (date: Date) => {
  */
 export const generateStatementPDF = async (data: StatementData, filepath: string): Promise<void> => {
   const labels = LABELS[data.language]
-  const hasUnicodeFonts = await helper.pathExists(FONT_REGULAR) && await helper.pathExists(FONT_BOLD)
+  const { regular, bold } = await pdfFonts.getFonts()
 
   const doc = new PDFDocument({ size: 'A4', margin: 50, bufferPages: true })
-  const regular = hasUnicodeFonts ? FONT_REGULAR : 'Helvetica'
-  const bold = hasUnicodeFonts ? FONT_BOLD : 'Helvetica-Bold'
 
   const stream = fs.createWriteStream(filepath)
   doc.pipe(stream)

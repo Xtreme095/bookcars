@@ -10,6 +10,8 @@ const routes = {
   getBookings: '/api/bookings/:page/:size/:language',
   hasBookings: '/api/has-bookings/:driver',
   cancelBooking: '/api/cancel-booking/:id',
+  getAgreement: '/api/booking-agreement/:id',
+  regenerateAgreement: '/api/regenerate-agreement/:id',
 }
 
 export default routes

@@ -119,6 +119,29 @@ const bookingSchema = new Schema<env.Booking>(
       type: Date,
       index: { name: BOOKING_EXPIRE_AT_INDEX_NAME, expireAfterSeconds: env.BOOKING_EXPIRE_AT, background: true },
     },
+
+    // P2P — rental agreement PDF generated on confirmation
+    // (stored in CDN_AGREEMENTS, streamed via authenticated endpoint)
+    agreement: {
+      type: new Schema<env.BookingAgreement>(
+        {
+          file: {
+            type: String,
+            required: [true, "can't be blank"],
+          },
+          language: {
+            type: String,
+            lowercase: true,
+            minlength: 2,
+            maxlength: 2,
+          },
+          generatedAt: {
+            type: Date,
+          },
+        },
+        { _id: false },
+      ),
+    },
   },
   {
     timestamps: true,

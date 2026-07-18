@@ -20,6 +20,7 @@ import AdditionalDriver from '../models/AdditionalDriver'
 import * as helper from '../utils/helper'
 import * as mailHelper from '../utils/mailHelper'
 import * as ledgerHelper from '../utils/ledgerHelper'
+import * as agreementHelper from '../utils/agreementHelper'
 import * as priceHelper from '../utils/priceHelper'
 import * as env from '../config/env.config'
 import * as logger from '../utils/logger'
@@ -176,6 +177,15 @@ export const confirm = async (user: env.User, supplier: env.User, booking: env.B
     const file = path.join(env.CDN_CONTRACTS, contractFile)
     if (await helper.pathExists(file)) {
       mailOptions.attachments = [{ path: file }]
+    }
+  }
+
+  // attach the rental agreement PDF (P2P)
+  const agreement = booking.agreement || (await Booking.findById(booking._id).select('agreement'))?.agreement
+  if (agreement?.file) {
+    const agreementFile = path.join(env.CDN_AGREEMENTS, path.basename(agreement.file))
+    if (await helper.pathExists(agreementFile)) {
+      mailOptions.attachments = [...(mailOptions.attachments || []), { path: agreementFile }]
     }
   }
 
@@ -436,6 +446,9 @@ export const checkout = async (req: Request, res: Response) => {
     }
 
     if (body.payLater || (booking.status === bookcarsTypes.BookingStatus.Paid && body.paymentIntentId && body.customerId)) {
+      // rental agreement PDF (P2P)
+      await agreementHelper.ensureAgreement(booking._id.toString())
+
       // Mark car as fully booked
       // if (env.MARK_CAR_AS_FULLY_BOOKED_ON_CHECKOUT) {
       //   await Car.updateOne({ _id: booking.car }, { fullyBooked: false })
@@ -695,6 +708,16 @@ export const update = async (req: Request, res: Response) => {
         await notifyDriver(booking)
       }
 
+      // regenerate the rental agreement so it reflects the updated booking (P2P)
+      if ([
+        bookcarsTypes.BookingStatus.Paid,
+        bookcarsTypes.BookingStatus.PaidInFull,
+        bookcarsTypes.BookingStatus.Deposit,
+        bookcarsTypes.BookingStatus.Reserved,
+      ].includes(status)) {
+        await agreementHelper.ensureAgreement(booking._id.toString(), true)
+      }
+
       res.json(booking)
       return
     }
@@ -731,6 +754,17 @@ export const updateStatus = async (req: Request, res: Response) => {
       if (booking.status !== status) {
         // revenue-share ledger transition (P2P)
         await ledgerHelper.onBookingStatusChange(booking._id.toString(), booking.status, status as bookcarsTypes.BookingStatus)
+
+        // rental agreement (P2P)
+        if ([
+          bookcarsTypes.BookingStatus.Paid,
+          bookcarsTypes.BookingStatus.PaidInFull,
+          bookcarsTypes.BookingStatus.Deposit,
+          bookcarsTypes.BookingStatus.Reserved,
+        ].includes(status as bookcarsTypes.BookingStatus)) {
+          await agreementHelper.ensureAgreement(booking._id.toString())
+        }
+
         await notifyDriver(booking)
       }
     }
@@ -1231,6 +1265,83 @@ export const cancelBooking = async (req: Request, res: Response) => {
     res.sendStatus(204)
   } catch (err) {
     logger.error(`[booking.cancelBooking] ${i18n.t('ERROR')} ${id}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
+  }
+}
+
+/**
+ * Stream the rental agreement PDF of a booking (admin, renter or booking
+ * supplier only).
+ *
+ * @export
+ * @async
+ * @param {Request} req
+ * @param {Response} res
+ * @returns {unknown}
+ */
+export const getAgreement = async (req: Request, res: Response) => {
+  const { id } = req.params
+
+  try {
+    if (!helper.isValidObjectId(id)) {
+      throw new Error('Booking id is not valid')
+    }
+
+    const booking = await Booking.findById(id).lean()
+    if (!booking || !booking.agreement?.file) {
+      res.sendStatus(204)
+      return
+    }
+
+    const sessionUser = req.user
+    const allowed = sessionUser
+      && (sessionUser.type === bookcarsTypes.UserType.Admin
+        || sessionUser._id === booking.driver.toString()
+        || sessionUser._id === booking.supplier.toString())
+    if (!allowed) {
+      res.status(403).send({ message: 'Forbidden' })
+      return
+    }
+
+    const filepath = path.join(env.CDN_AGREEMENTS, path.basename(booking.agreement.file))
+    if (!(await helper.pathExists(filepath))) {
+      res.sendStatus(204)
+      return
+    }
+
+    res.sendFile(path.resolve(filepath))
+  } catch (err) {
+    logger.error(`[booking.getAgreement] ${i18n.t('ERROR')} ${id}`, err)
+    res.status(400).send(i18n.t('ERROR') + err)
+  }
+}
+
+/**
+ * Regenerate the rental agreement PDF of a booking (admin).
+ *
+ * @export
+ * @async
+ * @param {Request} req
+ * @param {Response} res
+ * @returns {unknown}
+ */
+export const regenerateAgreement = async (req: Request, res: Response) => {
+  const { id } = req.params
+
+  try {
+    if (!helper.isValidObjectId(id)) {
+      throw new Error('Booking id is not valid')
+    }
+
+    const agreement = await agreementHelper.ensureAgreement(id, true)
+    if (!agreement) {
+      res.sendStatus(204)
+      return
+    }
+
+    res.json(agreement)
+  } catch (err) {
+    logger.error(`[booking.regenerateAgreement] ${i18n.t('ERROR')} ${id}`, err)
     res.status(400).send(i18n.t('ERROR') + err)
   }
 }

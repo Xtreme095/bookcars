@@ -102,6 +102,12 @@ export enum PaymentGateway {
   Stripe = 'stripe',
 }
 
+export interface BookingAgreement {
+  file: string
+  language?: string
+  generatedAt?: Date
+}
+
 export interface Booking {
   _id?: string
   supplier: string | User
@@ -128,6 +134,7 @@ export interface Booking {
   isDeposit?: boolean
   isPayedInFull?: boolean
   paypalOrderId?: string
+  agreement?: BookingAgreement
 }
 
 export interface CheckoutPayload {

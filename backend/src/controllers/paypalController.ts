@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import i18n from '../lang/i18n'
 import * as logger from '../utils/logger'
 import * as ledgerHelper from '../utils/ledgerHelper'
+import * as agreementHelper from '../utils/agreementHelper'
 import * as bookcarsTypes from ':bookcars-types'
 import * as env from '../config/env.config'
 import Booking from '../models/Booking'
@@ -93,6 +94,9 @@ export const checkPayPalOrder = async (req: Request, res: Response) => {
 
       // revenue-share ledger entry (P2P)
       await ledgerHelper.ensureLedgerEntry(booking._id.toString())
+
+      // rental agreement PDF (P2P)
+      await agreementHelper.ensureAgreement(booking._id.toString())
 
       const car = await Car.findById(booking.car)
       if (!car) {

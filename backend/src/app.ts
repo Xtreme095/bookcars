@@ -93,5 +93,6 @@ await helper.mkdir(env.CDN_TEMP_LICENSES)
 await helper.mkdir(env.CDN_HOST_DOCUMENTS)
 await helper.mkdir(env.CDN_TEMP_HOST_DOCUMENTS)
 await helper.mkdir(env.CDN_STATEMENTS)
+await helper.mkdir(env.CDN_AGREEMENTS)
 
 export default app
