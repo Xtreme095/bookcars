@@ -355,13 +355,38 @@ webhook applies the final decision through the same review endpoint logic.
   four workspaces and fails when any language is missing keys (LocalizedStrings
   blocks in admin/frontend, per-language files in backend/mobile).
 
-## Mobile app (v1 decision — Phase 6)
+## Pay-at-host (host cars)
 
-The mobile app stays **renter-only** in v1; the host portal and the admin panel
-are web-only. Mobile renters can browse and book classic supplier cars
-unchanged. Host cars appear in mobile search results, but booking one requires
-an approved identity verification, and the verification upload UI currently
-ships only in the web frontend (Settings → Identity verification) — the API
-rejects an unverified host-car checkout with "Renter verification required".
-Renters who verified on the web can book host cars from mobile normally. A
-native verification screen (and host features, if ever) are future work.
+At checkout (web and mobile), host cars replace the generic pay-later option
+with **"pay at the host's location at pickup"**, offered alongside online
+payment regardless of the owner's `payLater` flag. Mechanically it is the
+pay-later flow: the booking is created as Pending with no online payment. The
+host collects the amount **on the platform's behalf** at handover; once
+settled, the admin marks the booking Paid, which creates the commission ledger
+entry, and the host's share is included in the monthly payout as usual.
+
+## Mobile app
+
+The mobile app is **renter-complete**: browsing, identity verification
+(Settings → Identity verification: license front/back + ID upload, status,
+re-submission after rejection), booking host cars, and pay-at-host all work
+natively. The checkout screen gates host cars behind sign-in + approved
+verification with a shortcut to Settings. The host portal and the admin panel
+remain web-only.
+
+## Account deletion & data cleanup
+
+Deleting a user (admin → `POST /api/delete-users`) cascades over P2P data:
+
+- **any user**: identity documents (host application ID docs, renter
+  verification docs) are removed from the private documents folder;
+- **suppliers and hosts**: their cars (gallery images, registration documents,
+  unavailability periods), their bookings (with additional drivers and rental
+  agreement PDFs), commission ledger entries and payouts (with statement PDFs)
+  are deleted;
+- **renters**: their bookings and the associated rental agreement PDFs are
+  deleted; commission ledger entries are kept, as they are the car owner's
+  earnings record.
+
+Statements and agreements are accounting/legal documents — export anything
+that must be retained before deleting an account.
