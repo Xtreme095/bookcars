@@ -1,0 +1,74 @@
+div.host-cars {
+  display: flex;
+  flex-direction: column;
+  max-width: 1080px;
+  width: 100%;
+  margin: 30px auto;
+  padding: 0 15px;
+  min-height: 50vh;
+}
+
+div.host-cars .host-cars-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+div.host-cars .host-cars-header h1 {
+  font-size: 1.5em;
+  font-weight: 700;
+}
+
+div.host-cars .empty-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #676767;
+  padding: 60px 0;
+}
+
+div.host-cars .empty-list .empty-icon {
+  font-size: 3em;
+  margin-bottom: 10px;
+}
+
+div.host-cars .car-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+div.host-cars .car-card {
+  cursor: pointer;
+}
+
+div.host-cars .car-card-image {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+div.host-cars .car-card-image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f2f2f2;
+  color: #b5b5b5;
+}
+
+div.host-cars .car-card-status {
+  margin-top: 8px;
+  align-self: flex-start;
+}
+
+div.host-cars .car-card-rejection {
+  margin-top: 6px;
+}
+
+@media only screen and (max-width: 960px) {
+  div.host-cars .car-cards {
+    grid-template-columns: 1fr;
+  }
+}

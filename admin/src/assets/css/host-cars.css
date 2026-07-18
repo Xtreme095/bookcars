@@ -1,0 +1,47 @@
+div.admin-host-cars {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  height: calc(100vh - 64px);
+}
+
+div.admin-host-cars .host-cars-toolbar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+div.admin-host-cars .host-cars-grid {
+  flex: 1;
+  min-height: 0;
+}
+
+div.admin-host-cars .car-thumb {
+  width: 70px;
+  height: 46px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-top: 3px;
+}
+
+div.admin-host-cars .actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+}
+
+@media only screen and (max-width: 960px) {
+  div.admin-host-cars {
+    padding: 10px;
+    height: auto;
+  }
+
+  div.admin-host-cars .host-cars-grid {
+    min-height: 400px;
+  }
+}

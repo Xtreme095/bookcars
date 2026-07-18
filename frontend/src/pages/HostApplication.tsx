@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Paper,
   Button,
@@ -20,6 +21,7 @@ import Footer from '@/components/Footer'
 import HostDocument from '@/components/HostDocument'
 import { strings as commonStrings } from '@/lang/common'
 import { strings } from '@/lang/host'
+import { strings as hostCarsStrings } from '@/lang/host-cars'
 import * as HostService from '@/services/HostService'
 import * as helper from '@/utils/helper'
 import { schema, FormFields } from '@/models/HostApplicationForm'
@@ -27,6 +29,7 @@ import { schema, FormFields } from '@/models/HostApplicationForm'
 import '@/assets/css/host-application.css'
 
 const HostApplication = () => {
+  const navigate = useNavigate()
   const [visible, setVisible] = useState(false)
   const [hostProfile, setHostProfile] = useState<bookcarsTypes.HostProfile | null>(null)
   const [editing, setEditing] = useState(false)
@@ -167,7 +170,9 @@ const HostApplication = () => {
         {hostProfile.status === bookcarsTypes.HostStatus.Approved && (
           <>
             <Alert severity="success">{strings.STATUS_APPROVED}</Alert>
-            <p>{strings.STATUS_APPROVED_INFO}</p>
+            <Button variant="contained" className="btn-primary" onClick={() => navigate('/host/cars')}>
+              {hostCarsStrings.MY_VEHICLES}
+            </Button>
           </>
         )}
 

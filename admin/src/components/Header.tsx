@@ -35,6 +35,7 @@ import {
   AccountBalance as BankDetailsIcon,
   MonetizationOn as PricingIcon,
   Diversity3 as HostsIcon,
+  NoCrash as HostCarsIcon,
 } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import * as bookcarsTypes from ':bookcars-types'
@@ -332,15 +333,26 @@ const Header = ({
                   <ListItemText primary={strings.COMPANIES} />
                 </ListItem>
                 {helper.admin(user) && (
-                  <ListItem
-                    onClick={() => {
-                      navigate('/hosts')
-                      handleSideMenuClose()
-                    }}
-                  >
-                    <ListItemIcon><HostsIcon /></ListItemIcon>
-                    <ListItemText primary={hostStrings.HOSTS} />
-                  </ListItem>
+                  <>
+                    <ListItem
+                      onClick={() => {
+                        navigate('/hosts')
+                        handleSideMenuClose()
+                      }}
+                    >
+                      <ListItemIcon><HostsIcon /></ListItemIcon>
+                      <ListItemText primary={hostStrings.HOSTS} />
+                    </ListItem>
+                    <ListItem
+                      onClick={() => {
+                        navigate('/host-cars')
+                        handleSideMenuClose()
+                      }}
+                    >
+                      <ListItemIcon><HostCarsIcon /></ListItemIcon>
+                      <ListItemText primary={hostStrings.CARS} />
+                    </ListItem>
+                  </>
                 )}
                 <ListItem
                   onClick={() => {

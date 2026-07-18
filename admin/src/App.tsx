@@ -19,6 +19,7 @@ const CreateSupplier = lazy(() => import('@/pages/CreateSupplier'))
 const UpdateSupplier = lazy(() => import('@/pages/UpdateSupplier'))
 const Hosts = lazy(() => import('@/pages/Hosts'))
 const Host = lazy(() => import('@/pages/Host'))
+const HostCars = lazy(() => import('@/pages/HostCars'))
 const Locations = lazy(() => import('@/pages/Locations'))
 const CreateLocation = lazy(() => import('@/pages/CreateLocation'))
 const UpdateLocation = lazy(() => import('@/pages/UpdateLocation'))
@@ -91,6 +92,7 @@ const router = createBrowserRouter([
       { path: 'update-supplier', element: <UpdateSupplier /> },
       { path: 'hosts', element: <Hosts /> },
       { path: 'host', element: <Host /> },
+      { path: 'host-cars', element: <HostCars /> },
       { path: 'locations', element: <Locations /> },
       { path: 'create-location', element: <CreateLocation /> },
       { path: 'update-location', element: <UpdateLocation /> },

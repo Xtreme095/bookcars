@@ -41,6 +41,8 @@ const Faq = lazy(() => import('@/pages/Faq'))
 const CookiePolicy = lazy(() => import('@/pages/CookiePolicy'))
 const BecomeAHost = lazy(() => import('@/pages/BecomeAHost'))
 const HostApplication = lazy(() => import('@/pages/HostApplication'))
+const HostCars = lazy(() => import('@/pages/HostCars'))
+const HostCar = lazy(() => import('@/pages/HostCar'))
 
 const AppLayout = () => {
   const location = useLocation()
@@ -101,6 +103,8 @@ const router = createBrowserRouter([
       { path: 'cookie-policy', element: <CookiePolicy /> },
       { path: 'become-a-host', element: <BecomeAHost /> },
       { path: 'host', element: <HostApplication /> },
+      { path: 'host/cars', element: <HostCars /> },
+      { path: 'host/car', element: <HostCar /> },
       ...(env.HIDE_SUPPLIERS ? [] : [{ path: 'suppliers', element: <Suppliers /> }]),
       { path: '*', element: <NoMatch /> }
     ]

@@ -121,17 +121,85 @@ contract fields survive re-application.
 Admin-only endpoints use the `authJwt.authAdmin` middleware; self-scoped endpoints
 derive the user from the token, never from a client-supplied id.
 
-## Vehicle listing by hosts *(planned — Phase 2)*
+## Vehicle listing by hosts (Phase 2 — implemented)
 
-- `Car.status`: `draft → pending_review → active → suspended` (+ `rejected`);
-  `Car.available` kept in sync so existing search pipelines are unchanged.
-- `Car.registrationDocument` (prometna dozvola) stored privately like host ID docs.
-- `Car.minRentalDays` / `Car.maxRentalDays`, structured `make`/`model`/`year`.
-- `CarUnavailability { car, from, to, reason }` — host-blocked date ranges,
-  enforced during search and checkout alongside booking-overlap checks.
-- Host portal: vehicle CRUD + availability calendar; admin: vehicle review queue.
-- Supplier list aggregations extended to include approved hosts so host cars are
-  searchable (`type: 'supplier'` OR `host.status: 'approved'`).
+### Car data model extensions
+
+```
+Car {
+  ...existing BookCars fields...
+  status: 'draft' | 'pendingReview' | 'active' | 'rejected' | 'suspended'
+                              // indexed; default 'active' so classic supplier cars are untouched.
+                              // `available` is kept in sync with status for host cars, so every
+                              // existing search pipeline keeps working unchanged.
+  hostCar: boolean            // true when listed by a host through the portal
+  make, carModel: string      // structured identity (name = "<make> <carModel> <year>")
+  year: number
+  minRentalDays?, maxRentalDays?: number   // enforced in search AND checkout
+  registrationDocument?: string            // prometna dozvola — PRIVATE storage, streamed to owner/admin
+  images?: string[]           // extra photos beyond the main `image` (for review/detail)
+  rejectionReason?: string
+}
+
+CarUnavailability { car -> Car, from, to, reason? }   // host-blocked date ranges
+```
+
+Existing cars are migrated by `backend/scripts/migrate-p2p.ts` (idempotent:
+`available -> active`, `!available -> suspended`, `hostCar=false`).
+
+### Vehicle lifecycle
+
+```
+host creates draft ──edit──> draft ──submit (requires photo + prometna dozvola)──> pendingReview
+pendingReview ──admin approve──> active (available=true, searchable)
+pendingReview ──admin reject + reason──> rejected ──host fixes & resubmits──> pendingReview
+active ⇄ suspended (admin; also cascaded when the host is suspended —
+                    host reactivation does NOT auto-relist cars)
+```
+
+Host-car platform defaults: free cancellation, no per-car insurance upsells
+(amendments/theft protection/CDW/full insurance/additional driver unavailable),
+`blockOnPay=true`, minimum driver age from platform config.
+
+### Availability & booking guards
+
+Search (`getFrontendSuppliers` / `getFrontendCars`) excludes cars whose
+`CarUnavailability` periods overlap the requested rental window and cars whose
+`minRentalDays`/`maxRentalDays` don't fit the requested duration. Checkout
+re-validates server-side: car `available`, min/max days, unavailability overlap,
+plus a hard double-booking check for host cars (paid/reserved/deposit overlap).
+
+### API endpoints (Phase 2)
+
+| Endpoint | Auth | Purpose |
+|---|---|---|
+| `POST /api/create-host-car` | approved host | create draft |
+| `PUT /api/update-host-car` | approved host (own car) | edit |
+| `POST /api/submit-host-car/:id` | approved host (own car) | draft/rejected → pendingReview (+ admin notification) |
+| `POST /api/delete-host-car/:id` | approved host (own car) | delete (only without bookings) |
+| `GET /api/host-car/:id`, `POST /api/host-cars/:page/:size` | host (own) | detail / list |
+| `POST /api/create-host-car-image`, `POST /api/delete-temp-host-car-image/:image` | approved host | photo temp uploads |
+| `GET /api/car-registration-document/:carId` | owner or admin | stream prometna dozvola |
+| `POST /api/create-car-unavailability`, `POST /api/delete-car-unavailability/:id`, `GET /api/car-unavailabilities/:carId` | owner or admin | availability calendar |
+| `POST /api/admin-host-cars/:page/:size` | admin | review queue (status filter) |
+| `POST /api/review-host-car/:id` | admin | approve / reject-with-reason / suspend / reactivate (+ host notification) |
+
+### UI
+
+- **Frontend host portal**: `/host/cars` (vehicle list with status chips and
+  rejection reasons), `/host/car` (create/edit form — specs, plate, locations,
+  pricing, min/max days, main photo + gallery, prometna dozvola upload — plus
+  the availability calendar with blocked periods on saved cars).
+- **Admin**: `/host-cars` review queue (defaults to Pending review; status
+  filter, search, photo/registration viewing, approve/reject/suspend inline).
+
+### Search integration
+
+Supplier list endpoints include approved hosts (`type: 'supplier'` OR
+`host.status: 'approved'`; the admin variant also includes suspended hosts so
+their cars remain manageable). The car search pipelines already join owners by
+id, so active host cars flow through search, checkout and booking machinery
+without further changes.
 
 ## Revenue share & payouts *(planned — Phase 3)*
 

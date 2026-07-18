@@ -3,6 +3,7 @@ import * as bookcarsTypes from ':bookcars-types'
 import * as bookcarsHelper from ':bookcars-helper'
 import { strings } from '@/lang/cars'
 import { strings as commonStrings } from '@/lang/common'
+import { strings as hostCarsStrings } from '@/lang/host-cars'
 import env from '@/config/env.config'
 import * as PaymentService from '@/services/PaymentService'
 import * as UserService from '@/services/UserService'
@@ -726,5 +727,45 @@ export const getCarRange = (range: bookcarsTypes.CarRange) => {
 
     default:
       return ''
+  }
+}
+
+/**
+ * Get host car status label.
+ *
+ * @param {?bookcarsTypes.CarStatus} [status]
+ * @returns {string}
+ */
+export const getCarStatusLabel = (status?: bookcarsTypes.CarStatus): string => {
+  switch (status) {
+    case bookcarsTypes.CarStatus.Draft:
+      return hostCarsStrings.STATUS_DRAFT
+    case bookcarsTypes.CarStatus.PendingReview:
+      return hostCarsStrings.STATUS_PENDING_REVIEW
+    case bookcarsTypes.CarStatus.Active:
+      return hostCarsStrings.STATUS_ACTIVE
+    case bookcarsTypes.CarStatus.Rejected:
+      return hostCarsStrings.STATUS_REJECTED
+    default:
+      return hostCarsStrings.STATUS_SUSPENDED
+  }
+}
+
+/**
+ * Get host car status color.
+ *
+ * @param {?bookcarsTypes.CarStatus} [status]
+ * @returns {'default' | 'warning' | 'success' | 'error'}
+ */
+export const getCarStatusColor = (status?: bookcarsTypes.CarStatus): 'default' | 'warning' | 'success' | 'error' => {
+  switch (status) {
+    case bookcarsTypes.CarStatus.PendingReview:
+      return 'warning'
+    case bookcarsTypes.CarStatus.Active:
+      return 'success'
+    case bookcarsTypes.CarStatus.Rejected:
+      return 'error'
+    default:
+      return 'default'
   }
 }
