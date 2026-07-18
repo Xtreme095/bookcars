@@ -266,6 +266,18 @@ export const checkout = async (req: Request, res: Response) => {
         return
       }
     }
+    if (bookingCar.hostCar) {
+      // P2P: renters must be registered and identity-verified before booking a host car
+      if (driver) {
+        res.status(400).send('Renter verification required')
+        return
+      }
+      const renter = await User.findById(body.booking.driver)
+      if (renter?.verification?.status !== bookcarsTypes.VerificationStatus.Approved) {
+        res.status(400).send('Renter verification required')
+        return
+      }
+    }
 
     // server-side price verification — never trust the client-sent price
     const expectedPrice = priceHelper.calculateTotalPrice(

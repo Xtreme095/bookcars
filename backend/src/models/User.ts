@@ -368,6 +368,61 @@ const userSchema = new Schema<env.User>(
         { _id: false },
       ),
     },
+
+    // Renter verification (P2P) — identity documents reviewed before first booking
+    documents: {
+      type: new Schema<bookcarsTypes.RenterDocuments>(
+        {
+          licenseFront: {
+            type: String,
+          },
+          licenseBack: {
+            type: String,
+          },
+          idFront: {
+            type: String,
+          },
+          idBack: {
+            type: String,
+          },
+        },
+        { _id: false },
+      ),
+    },
+    verification: {
+      type: new Schema<env.RenterVerification>(
+        {
+          status: {
+            type: String,
+            enum: [
+              bookcarsTypes.VerificationStatus.Pending,
+              bookcarsTypes.VerificationStatus.Approved,
+              bookcarsTypes.VerificationStatus.Rejected,
+            ],
+            required: [true, "can't be blank"],
+          },
+          method: {
+            type: String,
+            default: 'manual',
+          },
+          submittedAt: {
+            type: Date,
+          },
+          reviewedBy: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+          },
+          reviewedAt: {
+            type: Date,
+          },
+          rejectionReason: {
+            type: String,
+            trim: true,
+          },
+        },
+        { _id: false },
+      ),
+    },
   },
   {
     timestamps: true,
@@ -378,6 +433,7 @@ const userSchema = new Schema<env.User>(
 
 // Add custom indexes
 userSchema.index({ 'host.status': 1 })
+userSchema.index({ 'verification.status': 1 })
 userSchema.index({ type: 1, expireAt: 1, fullName: 1 })
 userSchema.index({ type: 1, expireAt: 1, email: 1 })
 userSchema.index({ type: 1, expireAt: 1, fullName: 1, _id: 1 })

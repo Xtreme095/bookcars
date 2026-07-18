@@ -51,13 +51,13 @@ export const es = {
 
   NEW_REVIEW_SUBJECT: 'Nueva reseña recibida',
   NEW_REVIEW_BODY:
-    `Hola {{supplierName}},<br><br>`
-    + `Ha recibido una nueva reseña de {{customerName}} para su vehículo <strong>{{carName}}</strong>.<br><br>`
-    + `Calificación: {{rating}}/5 estrellas<br>`
-    + `Reserva: #{{bookingId}}<br><br>`
-    + `La reseña está pendiente de moderación y se publicará una vez aprobada.<br>`
-    + `Puede ver y responder a esta reseña en su panel de control.<br><br>`
-    + `Saludos cordiales,<br>El equipo de BookCars`,
+    'Hola {{supplierName}},<br><br>'
+    + 'Ha recibido una nueva reseña de {{customerName}} para su vehículo <strong>{{carName}}</strong>.<br><br>'
+    + 'Calificación: {{rating}}/5 estrellas<br>'
+    + 'Reserva: #{{bookingId}}<br><br>'
+    + 'La reseña está pendiente de moderación y se publicará una vez aprobada.<br>'
+    + 'Puede ver y responder a esta reseña en su panel de control.<br><br>'
+    + 'Saludos cordiales,<br>El equipo de BookCars',
 
   HOST_APPLICATION_RECEIVED_SUBJECT: 'Solicitud de anfitrión recibida',
   HOST_APPLICATION_RECEIVED_BODY: 'Gracias por solicitar convertirse en anfitrión. Revisaremos su solicitud y le responderemos en breve.',
@@ -75,4 +75,11 @@ export const es = {
   CAR_REJECTED_BODY: 'Lamentablemente, su anuncio de vehículo ha sido rechazado por el siguiente motivo:',
   CAR_SUSPENDED_SUBJECT: 'Su vehículo ha sido suspendido:',
   CAR_SUSPENDED_BODY: 'Su vehículo ha sido suspendido y ya no se puede reservar. Póngase en contacto con nosotros para más información.',
+  VERIFICATION_SUBMITTED_SUBJECT: 'Documentos de verificación recibidos',
+  VERIFICATION_SUBMITTED_BODY: 'Hemos recibido sus documentos de verificación de identidad. Los revisaremos y le responderemos en breve.',
+  NEW_VERIFICATION_NOTIFICATION: 'envió documentos de verificación de identidad',
+  VERIFICATION_APPROVED_SUBJECT: 'Su identidad ha sido verificada',
+  VERIFICATION_APPROVED_BODY: '¡Felicidades! Su verificación de identidad ha sido aprobada. Ya puede reservar cualquier vehículo en la plataforma.',
+  VERIFICATION_REJECTED_SUBJECT: 'Su verificación de identidad ha sido rechazada',
+  VERIFICATION_REJECTED_BODY: 'Lamentablemente, su verificación de identidad ha sido rechazada por el siguiente motivo:',
 }

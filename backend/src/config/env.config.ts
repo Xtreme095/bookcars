@@ -374,6 +374,16 @@ export const CDN_STATEMENTS = __env__('BC_CDN_STATEMENTS', false, '/var/www/priv
 export const CDN_AGREEMENTS = __env__('BC_CDN_AGREEMENTS', false, '/var/www/private/bookcars/agreements')
 
 /**
+ * Renter identity verification provider (P2P). Default 'manual' — admin
+ * reviews documents in the admin panel. A KYC vendor can be plugged in by
+ * implementing VerificationProvider and registering it in
+ * src/verification/index.ts.
+ *
+ * @type {string}
+ */
+export const VERIFICATION_PROVIDER = __env__('BC_VERIFICATION_PROVIDER', false, 'manual')
+
+/**
  * Admin host.
  *
  * @type {string}
@@ -644,6 +654,26 @@ export interface User extends Document {
 
   // Host profile (P2P) — present only for users who applied to become a host
   host?: HostProfile
+
+  // Renter verification (P2P)
+  documents?: bookcarsTypes.RenterDocuments
+  verification?: RenterVerification
+}
+
+/**
+ * Renter verification subdocument (P2P).
+ *
+ * @export
+ * @interface RenterVerification
+ * @typedef {RenterVerification}
+ */
+export interface RenterVerification {
+  status: bookcarsTypes.VerificationStatus
+  method?: string
+  submittedAt?: Date
+  reviewedBy?: Types.ObjectId
+  reviewedAt?: Date
+  rejectionReason?: string
 }
 
 /**

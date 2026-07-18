@@ -15,8 +15,8 @@ export const hr = {
   ACCOUNT_ACTIVATION_RESEND_ERROR: 'Nismo mogli pronaći korisnika s tom e-mail adresom. Provjerite je li vaša e-mail adresa točna.',
   ACCOUNT_ACTIVATION_ACCOUNT_VERIFIED: 'Ovaj račun je već verificiran. Molimo prijavite se.',
   ACCOUNT_ACTIVATION_EMAIL_SENT_PART_1: 'E-mail za validaciju poslan je na ',
-  ACCOUNT_ACTIVATION_EMAIL_SENT_PART_2: ". Isteći će nakon jednog dana. Ako niste primili e-mail za validaciju, kliknite na pošalji ponovno.",
-  CAR_IMAGE_REQUIRED: "Polje za sliku automobila ne može biti prazno: ",
+  ACCOUNT_ACTIVATION_EMAIL_SENT_PART_2: '. Isteći će nakon jednog dana. Ako niste primili e-mail za validaciju, kliknite na pošalji ponovno.',
+  CAR_IMAGE_REQUIRED: 'Polje za sliku automobila ne može biti prazno: ',
   CAR_IMAGE_NOT_FOUND: 'Datoteka slike nije pronađena: ',
   PASSWORD_RESET_SUBJECT: 'Resetiranje lozinke',
   PASSWORD_RESET_LINK: 'Molimo resetirajte svoju lozinku klikom na link:',
@@ -29,7 +29,7 @@ export const hr = {
   BOOKING_CONFIRMED_PART5: ') dana ',
   BOOKING_CONFIRMED_PART6: ` (${env.TIMEZONE}) kako biste preuzeli svoje vozilo `,
   BOOKING_CONFIRMED_PART7: '.',
-  BOOKING_CONFIRMED_PART8: "Molimo donesite svoju osobnu iskaznicu, vozačku dozvolu i garancijski ček.",
+  BOOKING_CONFIRMED_PART8: 'Molimo donesite svoju osobnu iskaznicu, vozačku dozvolu i garancijski ček.',
   BOOKING_CONFIRMED_PART9: 'Vozilo morate vratiti našoj agenciji ',
   BOOKING_CONFIRMED_PART10: ' (',
   BOOKING_CONFIRMED_PART11: ') dana ',
@@ -51,13 +51,13 @@ export const hr = {
 
   NEW_REVIEW_SUBJECT: 'Nova recenzija primljena',
   NEW_REVIEW_BODY:
-    `Pozdrav {{supplierName}},<br><br>`
-    + `Primili ste novu recenziju od {{customerName}} za vaše vozilo <strong>{{carName}}</strong>.<br><br>`
-    + `Ocjena: {{rating}}/5 zvjezdica<br>`
-    + `Rezervacija: #{{bookingId}}<br><br>`
-    + `Recenzija trenutno čeka moderaciju i bit će objavljena nakon odobrenja.<br>`
-    + `Možete vidjeti i odgovoriti na ovu recenziju na svojoj nadzornoj ploči.<br><br>`
-    + `Srdačan pozdrav,<br>BookCars Tim`,
+    'Pozdrav {{supplierName}},<br><br>'
+    + 'Primili ste novu recenziju od {{customerName}} za vaše vozilo <strong>{{carName}}</strong>.<br><br>'
+    + 'Ocjena: {{rating}}/5 zvjezdica<br>'
+    + 'Rezervacija: #{{bookingId}}<br><br>'
+    + 'Recenzija trenutno čeka moderaciju i bit će objavljena nakon odobrenja.<br>'
+    + 'Možete vidjeti i odgovoriti na ovu recenziju na svojoj nadzornoj ploči.<br><br>'
+    + 'Srdačan pozdrav,<br>BookCars Tim',
 
   HOST_APPLICATION_RECEIVED_SUBJECT: 'Zaprimljena prijava za domaćina',
   HOST_APPLICATION_RECEIVED_BODY: 'Hvala vam na prijavi za domaćina. Pregledat ćemo vašu prijavu i javiti vam se uskoro.',
@@ -75,4 +75,11 @@ export const hr = {
   CAR_REJECTED_BODY: 'Nažalost, vaš oglas za vozilo je odbijen iz sljedećeg razloga:',
   CAR_SUSPENDED_SUBJECT: 'Vaše vozilo je suspendirano:',
   CAR_SUSPENDED_BODY: 'Vaše vozilo je suspendirano i više se ne može rezervirati. Molimo kontaktirajte nas za više informacija.',
+  VERIFICATION_SUBMITTED_SUBJECT: 'Zaprimljeni dokumenti za provjeru identiteta',
+  VERIFICATION_SUBMITTED_BODY: 'Zaprimili smo vaše dokumente za provjeru identiteta. Pregledat ćemo ih i javiti vam se uskoro.',
+  NEW_VERIFICATION_NOTIFICATION: 'poslao/la je dokumente za provjeru identiteta',
+  VERIFICATION_APPROVED_SUBJECT: 'Vaš identitet je potvrđen',
+  VERIFICATION_APPROVED_BODY: 'Čestitamo! Vaša provjera identiteta je odobrena. Sada možete rezervirati bilo koje vozilo na platformi.',
+  VERIFICATION_REJECTED_SUBJECT: 'Vaša provjera identiteta je odbijena',
+  VERIFICATION_REJECTED_BODY: 'Nažalost, vaša provjera identiteta je odbijena iz sljedećeg razloga:',
 }

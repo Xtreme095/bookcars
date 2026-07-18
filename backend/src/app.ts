@@ -24,6 +24,7 @@ import commissionRoutes from './routes/commissionRoutes'
 import hostRoutes from './routes/hostRoutes'
 import hostCarRoutes from './routes/hostCarRoutes'
 import payoutRoutes from './routes/payoutRoutes'
+import verificationRoutes from './routes/verificationRoutes'
 import * as helper from './utils/helper'
 
 const app = express()
@@ -72,6 +73,7 @@ app.use('/', commissionRoutes)
 app.use('/', hostRoutes)
 app.use('/', hostCarRoutes)
 app.use('/', payoutRoutes)
+app.use('/', verificationRoutes)
 
 if (env.ENABLE_SENTRY) {
   Sentry.setupExpressErrorHandler(app)

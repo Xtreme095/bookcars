@@ -51,13 +51,13 @@ export const en = {
 
   NEW_REVIEW_SUBJECT: 'New Review Received',
   NEW_REVIEW_BODY:
-    `Hello {{supplierName}},<br><br>`
-    + `You have received a new review from {{customerName}} for your vehicle <strong>{{carName}}</strong>.<br><br>`
-    + `Rating: {{rating}}/5 stars<br>`
-    + `Booking: #{{bookingId}}<br><br>`
-    + `The review is currently pending moderation and will be published once approved.<br>`
-    + `You can view and respond to this review in your dashboard.<br><br>`
-    + `Best regards,<br>The BookCars Team`,
+    'Hello {{supplierName}},<br><br>'
+    + 'You have received a new review from {{customerName}} for your vehicle <strong>{{carName}}</strong>.<br><br>'
+    + 'Rating: {{rating}}/5 stars<br>'
+    + 'Booking: #{{bookingId}}<br><br>'
+    + 'The review is currently pending moderation and will be published once approved.<br>'
+    + 'You can view and respond to this review in your dashboard.<br><br>'
+    + 'Best regards,<br>The BookCars Team',
 
   HOST_APPLICATION_RECEIVED_SUBJECT: 'Host application received',
   HOST_APPLICATION_RECEIVED_BODY: 'Thank you for applying to become a host. We will review your application and get back to you shortly.',
@@ -75,4 +75,11 @@ export const en = {
   CAR_REJECTED_BODY: 'Unfortunately, your car listing has been rejected for the following reason:',
   CAR_SUSPENDED_SUBJECT: 'Your car has been suspended:',
   CAR_SUSPENDED_BODY: 'Your car has been suspended and is no longer bookable. Please contact us for more information.',
+  VERIFICATION_SUBMITTED_SUBJECT: 'Verification documents received',
+  VERIFICATION_SUBMITTED_BODY: 'We have received your identity verification documents. We will review them and get back to you shortly.',
+  NEW_VERIFICATION_NOTIFICATION: 'submitted identity verification documents',
+  VERIFICATION_APPROVED_SUBJECT: 'Your identity has been verified',
+  VERIFICATION_APPROVED_BODY: 'Congratulations! Your identity verification has been approved. You can now book any car on the platform.',
+  VERIFICATION_REJECTED_SUBJECT: 'Your identity verification has been rejected',
+  VERIFICATION_REJECTED_BODY: 'Unfortunately, your identity verification has been rejected for the following reason:',
 }

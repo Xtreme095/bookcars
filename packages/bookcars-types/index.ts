@@ -17,6 +17,19 @@ export enum HostDocumentType {
   VehicleRegistration = 'vehicleRegistration',
 }
 
+export enum RenterDocumentType {
+  LicenseFront = 'licenseFront',
+  LicenseBack = 'licenseBack',
+  IdFront = 'idFront',
+  IdBack = 'idBack',
+}
+
+export enum VerificationStatus {
+  Pending = 'pending',
+  Approved = 'approved',
+  Rejected = 'rejected',
+}
+
 export enum CarStatus {
   Draft = 'draft',
   PendingReview = 'pendingReview',
@@ -446,6 +459,8 @@ export interface User {
   supplierCarLimit?: number
   notifyAdminOnNewCar?: boolean
   host?: HostProfile
+  documents?: RenterDocuments
+  verification?: RenterVerification
 }
 
 export interface HostProfile {
@@ -495,6 +510,38 @@ export interface ReviewHostPayload {
 
 export interface GetHostsBody {
   statuses?: HostStatus[]
+}
+
+export interface RenterDocuments {
+  licenseFront?: string
+  licenseBack?: string
+  idFront?: string
+  idBack?: string
+}
+
+export interface RenterVerification {
+  status: VerificationStatus
+  method?: string
+  submittedAt?: Date
+  reviewedBy?: string
+  reviewedAt?: Date
+  rejectionReason?: string
+}
+
+export interface SubmitVerificationPayload {
+  licenseFront: string
+  licenseBack: string
+  idFront: string
+  idBack?: string
+}
+
+export interface ReviewVerificationPayload {
+  status: VerificationStatus
+  rejectionReason?: string
+}
+
+export interface GetVerificationsBody {
+  statuses?: VerificationStatus[]
 }
 
 export interface Option {
