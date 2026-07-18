@@ -21,6 +21,7 @@ import Button from '@/components/Button'
 import * as helper from '@/utils/helper'
 import * as env from '@/config/env.config'
 import DriverLicense from '@/components/DriverLicense'
+import Verification from '@/components/Verification'
 
 const SettingsScreen = () => {
   const isFocused = useIsFocused()
@@ -354,6 +355,8 @@ const SettingsScreen = () => {
               <TextInput style={styles.component} label={i18n.t('BIO')} value={bio} onChangeText={onChangeBio} />
 
               <DriverLicense user={user} />
+
+              <Verification style={styles.component} />
 
               <Switch
                 style={styles.component}

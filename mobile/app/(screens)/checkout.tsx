@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router'
 import { MaterialIcons } from '@expo/vector-icons'
 import validator from 'validator'
 import { format, intervalToDuration } from 'date-fns'
-import { enUS, fr, es } from 'date-fns/locale'
+import { enUS, fr, es, hr } from 'date-fns/locale'
 import { PaymentSheetError, initPaymentSheet, useStripe } from '@stripe/stripe-react-native'
 import { useIsFocused } from '@react-navigation/native'
 
@@ -27,6 +27,7 @@ import * as CarService from '@/services/CarService'
 import * as LocationService from '@/services/LocationService'
 import * as BookingService from '@/services/BookingService'
 import * as StripeService from '@/services/StripeService'
+import * as VerificationService from '@/services/VerificationService'
 import * as env from '@/config/env.config'
 import Backdrop from '@/components/Backdrop'
 import Indicator from '@/components/Indicator'
@@ -108,6 +109,9 @@ const CheckoutScreen = () => {
   const [adManuallyChecked, setAdManuallyChecked] = useState(false)
   const [licenseRequired, setLicenseRequired] = useState(false)
   const [license, setLicense] = useState<string | null>(null)
+  // P2P: renter identity verification state (host cars only)
+  const [verificationStatus, setVerificationStatus] = useState<bookcarsTypes.VerificationStatus | null>(null)
+  const [verificationRequired, setVerificationRequired] = useState(false)
   const [depositPrice, setDepositPrice] = useState(0)
   const [payDeposit, setPayDeposit] = useState(false)
   const [payInFull, setPayInFull] = useState(false)
@@ -136,7 +140,7 @@ const CheckoutScreen = () => {
       i18n.locale = _language
       setLanguage(_language)
       
-      const _locale = _language === 'fr' ? fr : _language === 'es' ? es : enUS
+      const _locale = _language === 'fr' ? fr : _language === 'es' ? es : _language === 'hr' ? hr : enUS
       setLocale(_locale)
 
       setAuthenticated(false)
@@ -242,6 +246,15 @@ const CheckoutScreen = () => {
 
       const _car = await CarService.getCar(car)
       setCar(_car)
+
+      // P2P: host cars require an identity-verified renter
+      setVerificationRequired(false)
+      if (_car.hostCar && _user) {
+        const verificationInfo = await VerificationService.getVerification()
+        setVerificationStatus(verificationInfo?.verification?.status || null)
+      } else {
+        setVerificationStatus(null)
+      }
 
       setPayInFull(_car.deposit === 0)
 
@@ -632,6 +645,12 @@ const CheckoutScreen = () => {
         return
       }
 
+      // P2P: host cars require a signed-in renter with approved identity verification
+      if (__car.hostCar && (!authenticated || verificationStatus !== bookcarsTypes.VerificationStatus.Approved)) {
+        setVerificationRequired(true)
+        return
+      }
+
       if (adManuallyChecked && additionalDriver) {
         const fullNameValid = _validateFullName()
         if (!fullNameValid) {
@@ -678,7 +697,7 @@ const CheckoutScreen = () => {
       try {
         if (!payLater) {
           const name = bookcarsHelper.truncateString(`${env.WEBSITE_NAME} - ${__car.name}`, StripeService.ORDER_NAME_MAX_LENGTH)
-          const _locale = _fr ? fr : _es ? es : enUS
+          const _locale = _fr ? fr : _es ? es : _hr ? hr : enUS
           const daysLabel = __from && __to && `${helper.getDaysShort(days)} (${bookcarsHelper.capitalize(format(__from, _format, { locale: _locale }))} - ${bookcarsHelper.capitalize(format(__to, _format, { locale: _locale }))})`
           const _description = `${env.WEBSITE_NAME} - ${__car.name} - ${daysLabel} - ${__pickupLocation._id === __dropOffLocation._id ? __pickupLocation.name : `${__pickupLocation.name} - ${__dropOffLocation.name}`}`
           const description = bookcarsHelper.truncateString(_description, StripeService.ORDER_DESCRIPTION_MAX_LENGTH)
@@ -830,6 +849,7 @@ const CheckoutScreen = () => {
   const iconColor = '#000'
   const _fr = bookcarsHelper.isFrench(language)
   const _es = language === 'es'
+  const _hr = language === 'hr'
   // Spanish and French usually follow the same 'Day Month Year' structure
   const _format = (_fr || _es)
     ? 'eee d LLL yyyy kk:mm'
@@ -1053,6 +1073,33 @@ const CheckoutScreen = () => {
                     </View>
                   )}
 
+                  {__car.hostCar && (!authenticated || verificationStatus !== bookcarsTypes.VerificationStatus.Approved) && (
+                    <View style={styles.section}>
+                      <View style={styles.sectionHeader}>
+                        <MaterialIcons name="verified-user" size={iconSize} color={iconColor} />
+                        <Text style={styles.sectionHeaderText}>{i18n.t('VERIFICATION_REQUIRED_TITLE')}</Text>
+                      </View>
+
+                      <Text style={styles.verificationText}>
+                        {!authenticated
+                          ? i18n.t('VERIFICATION_REQUIRED_SIGN_IN')
+                          : verificationStatus === bookcarsTypes.VerificationStatus.Pending
+                            ? i18n.t('VERIFICATION_REQUIRED_PENDING')
+                            : i18n.t('VERIFICATION_REQUIRED_UNVERIFIED')}
+                      </Text>
+
+                      {(!authenticated || verificationStatus !== bookcarsTypes.VerificationStatus.Pending) && (
+                        <Button
+                          style={styles.component}
+                          label={authenticated ? i18n.t('VERIFY_IDENTITY') : i18n.t('SIGN_IN')}
+                          onPress={() => {
+                            router.push(authenticated ? '/settings' : '/sign-in')
+                          }}
+                        />
+                      )}
+                    </View>
+                  )}
+
                   {__car.supplier.licenseRequired && (
                     <View style={styles.section}>
                       <View style={styles.sectionHeader}>
@@ -1160,10 +1207,10 @@ const CheckoutScreen = () => {
                       <Text style={styles.sectionHeaderText}>{i18n.t('PAYMENT_OPTIONS')}</Text>
                     </View>
 
-                    {__car.supplier.payLater && (
+                    {(__car.hostCar || __car.supplier.payLater) && (
                       <>
                         <RadioButton
-                          label={i18n.t('PAY_LATER')}
+                          label={i18n.t(__car.hostCar ? 'PAY_AT_HOST' : 'PAY_LATER')}
                           checked={payLater}
                           onValueChange={(checked: boolean) => {
                             setPayLater(checked)
@@ -1171,7 +1218,7 @@ const CheckoutScreen = () => {
                             setPayInFull(!checked)
                           }}
                         />
-                        <Text style={styles.paymentInfo}>{i18n.t('PAY_LATER_INFO')}</Text>
+                        <Text style={styles.paymentInfo}>{i18n.t(__car.hostCar ? 'PAY_AT_HOST_INFO' : 'PAY_LATER_INFO')}</Text>
                       </>
                     )}
 
@@ -1228,6 +1275,7 @@ const CheckoutScreen = () => {
                       {error && <Error message={i18n.t('FIX_ERRORS')} />}
                       {tosError && <Error message={i18n.t('TOS_ERROR')} />}
                       {licenseRequired && <Error message={i18n.t('LICENSE_REQUIRED')} />}
+                      {verificationRequired && <Error message={i18n.t('VERIFICATION_REQUIRED_ERROR')} />}
                     </View>
 
                     <Button style={styles.component} label={i18n.t('BOOK_NOW')} onPress={handleCheckout} />
@@ -1373,6 +1421,11 @@ const styles = StyleSheet.create({
     color: 'rgba(0, 0, 0, 0.35)',
     fontSize: 12,
     marginLeft: 25,
+  },
+  verificationText: {
+    color: '#333',
+    fontSize: 13,
+    padding: 10,
   },
   payment: {
     alignSelf: 'stretch',
