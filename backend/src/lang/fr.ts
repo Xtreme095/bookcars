@@ -68,4 +68,11 @@ export const fr = {
   HOST_REJECTED_BODY: 'Malheureusement, votre candidature d\'hôte a été refusée pour la raison suivante :',
   HOST_SUSPENDED_SUBJECT: 'Votre compte d\'hôte a été suspendu',
   HOST_SUSPENDED_BODY: 'Votre compte d\'hôte a été suspendu. Veuillez nous contacter pour plus d\'informations.',
+  CAR_SUBMITTED_NOTIFICATION: 'a soumis un véhicule pour examen :',
+  CAR_APPROVED_SUBJECT: 'Votre véhicule a été approuvé :',
+  CAR_APPROVED_BODY: 'Félicitations ! Votre véhicule a été approuvé et est maintenant en ligne.',
+  CAR_REJECTED_SUBJECT: 'Votre annonce de véhicule a été refusée :',
+  CAR_REJECTED_BODY: 'Malheureusement, votre annonce de véhicule a été refusée pour la raison suivante :',
+  CAR_SUSPENDED_SUBJECT: 'Votre véhicule a été suspendu :',
+  CAR_SUSPENDED_BODY: "Votre véhicule a été suspendu et n'est plus réservable. Veuillez nous contacter pour plus d'informations.",
 }

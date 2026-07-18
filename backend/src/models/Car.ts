@@ -210,6 +210,65 @@ const carSchema = new Schema<env.Car>(
       type: Boolean,
       default: true,
     },
+
+    // P2P (host-listed cars)
+    status: {
+      // Lifecycle of host-listed cars: draft -> pendingReview -> active -> suspended.
+      // Classic supplier/admin cars stay 'active'; `available` is kept in sync with
+      // status for host cars so all existing search pipelines keep working unchanged.
+      type: String,
+      enum: [
+        bookcarsTypes.CarStatus.Draft,
+        bookcarsTypes.CarStatus.PendingReview,
+        bookcarsTypes.CarStatus.Active,
+        bookcarsTypes.CarStatus.Rejected,
+        bookcarsTypes.CarStatus.Suspended,
+      ],
+      default: bookcarsTypes.CarStatus.Active,
+      index: true,
+    },
+    hostCar: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    make: {
+      type: String,
+      trim: true,
+    },
+    carModel: {
+      type: String,
+      trim: true,
+    },
+    year: {
+      type: Number,
+      min: 1950,
+      validate: {
+        validator: Number.isInteger,
+        message: '{VALUE} is not an integer',
+      },
+    },
+    minRentalDays: {
+      type: Number,
+      min: 1,
+    },
+    maxRentalDays: {
+      type: Number,
+      min: 1,
+    },
+    registrationDocument: {
+      // vehicle registration (prometna dozvola) filename, stored in CDN_HOST_DOCUMENTS (private)
+      type: String,
+    },
+    images: {
+      // additional photos beyond the main `image`
+      type: [String],
+      default: undefined,
+    },
+    rejectionReason: {
+      type: String,
+      trim: true,
+    },
     isCargoVehicle: {
       type: Boolean,
       default: false,

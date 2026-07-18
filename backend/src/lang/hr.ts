@@ -68,4 +68,11 @@ export const hr = {
   HOST_REJECTED_BODY: 'Nažalost, vaša prijava za domaćina je odbijena iz sljedećeg razloga:',
   HOST_SUSPENDED_SUBJECT: 'Vaš račun domaćina je suspendiran',
   HOST_SUSPENDED_BODY: 'Vaš račun domaćina je suspendiran. Molimo kontaktirajte nas za više informacija.',
+  CAR_SUBMITTED_NOTIFICATION: 'poslao/la je vozilo na pregled:',
+  CAR_APPROVED_SUBJECT: 'Vaše vozilo je odobreno:',
+  CAR_APPROVED_BODY: 'Čestitamo! Vaše vozilo je odobreno i sada je objavljeno.',
+  CAR_REJECTED_SUBJECT: 'Vaš oglas za vozilo je odbijen:',
+  CAR_REJECTED_BODY: 'Nažalost, vaš oglas za vozilo je odbijen iz sljedećeg razloga:',
+  CAR_SUSPENDED_SUBJECT: 'Vaše vozilo je suspendirano:',
+  CAR_SUSPENDED_BODY: 'Vaše vozilo je suspendirano i više se ne može rezervirati. Molimo kontaktirajte nas za više informacija.',
 }

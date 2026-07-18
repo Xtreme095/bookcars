@@ -68,4 +68,11 @@ export const en = {
   HOST_REJECTED_BODY: 'Unfortunately, your host application has been rejected for the following reason:',
   HOST_SUSPENDED_SUBJECT: 'Your host account has been suspended',
   HOST_SUSPENDED_BODY: 'Your host account has been suspended. Please contact us for more information.',
+  CAR_SUBMITTED_NOTIFICATION: 'submitted a car for review:',
+  CAR_APPROVED_SUBJECT: 'Your car has been approved:',
+  CAR_APPROVED_BODY: 'Congratulations! Your car has been approved and is now live.',
+  CAR_REJECTED_SUBJECT: 'Your car listing has been rejected:',
+  CAR_REJECTED_BODY: 'Unfortunately, your car listing has been rejected for the following reason:',
+  CAR_SUSPENDED_SUBJECT: 'Your car has been suspended:',
+  CAR_SUSPENDED_BODY: 'Your car has been suspended and is no longer bookable. Please contact us for more information.',
 }

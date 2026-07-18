@@ -295,7 +295,10 @@ export const getSuppliers = async (req: Request, res: Response) => {
       [
         {
           $match: {
-            type: bookcarsTypes.UserType.Supplier,
+            $or: [
+              { type: bookcarsTypes.UserType.Supplier },
+              { 'host.status': bookcarsTypes.HostStatus.Approved },
+            ],
             avatar: { $ne: null },
             fullName: { $regex: keyword, $options: options },
           },
@@ -362,7 +365,16 @@ export const getAllSuppliers = async (req: Request, res: Response) => {
   try {
     let data = await User.aggregate(
       [
-        { $match: { type: bookcarsTypes.UserType.Supplier, avatar: { $ne: null } } },
+        {
+          $match: {
+            $or: [
+              // classic suppliers
+              { type: bookcarsTypes.UserType.Supplier, avatar: { $ne: null } },
+              // hosts (P2P) — included so admins can filter host cars
+              { 'host.status': { $in: [bookcarsTypes.HostStatus.Approved, bookcarsTypes.HostStatus.Suspended] } },
+            ],
+          },
+        },
         { $sort: { fullName: 1, _id: 1 } },
       ],
       { collation: { locale: env.DEFAULT_LANGUAGE, strength: 2 } },
@@ -493,6 +505,11 @@ export const getFrontendSuppliers = async (req: Request, res: Response) => {
     if (days) {
       $supplierMatch = { $or: [{ 'supplier.minimumRentalDays': { $lte: days } }, { 'supplier.minimumRentalDays': null }] }
     }
+    if (days) {
+      // car-level rental duration constraints (P2P host cars)
+      $match.$and!.push({ $or: [{ minRentalDays: null }, { minRentalDays: { $lte: days } }] })
+      $match.$and!.push({ $or: [{ maxRentalDays: null }, { maxRentalDays: { $gte: days } }] })
+    }
 
     const data = await Car.aggregate(
       [
@@ -572,6 +589,45 @@ export const getFrontendSuppliers = async (req: Request, res: Response) => {
           }
         },
         // end of booking overlap check -----------------------------------
+
+        // begining of unavailability overlap check ----------------------------
+        // host-blocked date ranges (P2P): cars with an unavailability period
+        // overlapping the requested rental period are excluded
+        // ----------------------------------------------------------------------
+        {
+          $lookup: {
+            from: 'CarUnavailability',
+            let: { carId: '$_id' },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      { $eq: ['$car', '$$carId'] },
+                      {
+                        $not: [
+                          {
+                            $or: [
+                              { $lt: ['$to', new Date(from)] },
+                              { $gt: ['$from', new Date(to)] }
+                            ]
+                          }
+                        ]
+                      },
+                    ]
+                  }
+                }
+              }
+            ],
+            as: 'unavailabilityPeriods'
+          }
+        },
+        {
+          $match: {
+            $expr: { $eq: [{ $size: '$unavailabilityPeriods' }, 0] }
+          }
+        },
+        // end of unavailability overlap check ----------------------------
 
         // begining of supplierCarLimit -----------------------------------
         {

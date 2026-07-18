@@ -3,6 +3,7 @@ import * as env from '../config/env.config'
 import * as logger from './logger'
 import Booking, { BOOKING_EXPIRE_AT_INDEX_NAME } from '../models/Booking'
 import Car from '../models/Car'
+import CarUnavailability from '../models/CarUnavailability'
 import Location from '../models/Location'
 import LocationValue from '../models/LocationValue'
 import Notification from '../models/Notification'
@@ -216,6 +217,7 @@ export const models = defineModels([
   BankDetails,
   Booking,
   Car,
+  CarUnavailability,
   CommissionTransaction,
   Country,
   DateBasedPrice,

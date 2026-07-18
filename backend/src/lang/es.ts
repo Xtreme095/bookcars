@@ -68,4 +68,11 @@ export const es = {
   HOST_REJECTED_BODY: 'Lamentablemente, su solicitud de anfitrión ha sido rechazada por el siguiente motivo:',
   HOST_SUSPENDED_SUBJECT: 'Su cuenta de anfitrión ha sido suspendida',
   HOST_SUSPENDED_BODY: 'Su cuenta de anfitrión ha sido suspendida. Póngase en contacto con nosotros para más información.',
+  CAR_SUBMITTED_NOTIFICATION: 'envió un vehículo para revisión:',
+  CAR_APPROVED_SUBJECT: 'Su vehículo ha sido aprobado:',
+  CAR_APPROVED_BODY: '¡Felicidades! Su vehículo ha sido aprobado y ya está publicado.',
+  CAR_REJECTED_SUBJECT: 'Su anuncio de vehículo ha sido rechazado:',
+  CAR_REJECTED_BODY: 'Lamentablemente, su anuncio de vehículo ha sido rechazado por el siguiente motivo:',
+  CAR_SUSPENDED_SUBJECT: 'Su vehículo ha sido suspendido:',
+  CAR_SUSPENDED_BODY: 'Su vehículo ha sido suspendido y ya no se puede reservar. Póngase en contacto con nosotros para más información.',
 }

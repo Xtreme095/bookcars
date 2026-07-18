@@ -802,6 +802,18 @@ export interface Car extends Document {
   co2?: number
   blockOnPay?: boolean
 
+  // P2P (host-listed cars)
+  status?: bookcarsTypes.CarStatus
+  hostCar?: boolean
+  make?: string
+  carModel?: string
+  year?: number
+  minRentalDays?: number
+  maxRentalDays?: number
+  registrationDocument?: string
+  images?: string[]
+  rejectionReason?: string
+
   isCargoVehicle?: boolean
   cargoType?: 'van_small' | 'van_medium' | 'van_large' | 'pickup_truck' | 'box_truck' | 'refrigerated' | 'flatbed'
   cargoSpecs?: {
@@ -1110,6 +1122,22 @@ export const allowedLicenseExtensions = [
 export const allowedContractExtensions = [
   '.pdf',
 ]
+
+/**
+ * CarUnavailability Document (P2P) — a date range during which a host's car
+ * cannot be booked (host-blocked dates).
+ *
+ * @export
+ * @interface CarUnavailability
+ * @typedef {CarUnavailability}
+ * @extends {Document}
+ */
+export interface CarUnavailability extends Document {
+  car: Types.ObjectId
+  from: Date
+  to: Date
+  reason?: string
+}
 
 /**
  * CommissionTransaction Document.

@@ -22,6 +22,7 @@ import bankDetailsRoutes from './routes/bankDetailsRoutes'
 import settingRoutes from './routes/settingRoutes'
 import commissionRoutes from './routes/commissionRoutes'
 import hostRoutes from './routes/hostRoutes'
+import hostCarRoutes from './routes/hostCarRoutes'
 import * as helper from './utils/helper'
 
 const app = express()
@@ -68,6 +69,7 @@ app.use('/', bankDetailsRoutes)
 app.use('/', settingRoutes)
 app.use('/', commissionRoutes)
 app.use('/', hostRoutes)
+app.use('/', hostCarRoutes)
 
 if (env.ENABLE_SENTRY) {
   Sentry.setupExpressErrorHandler(app)

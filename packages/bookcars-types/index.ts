@@ -14,6 +14,15 @@ export enum HostStatus {
 export enum HostDocumentType {
   IdFront = 'idFront',
   IdBack = 'idBack',
+  VehicleRegistration = 'vehicleRegistration',
+}
+
+export enum CarStatus {
+  Draft = 'draft',
+  PendingReview = 'pendingReview',
+  Active = 'active',
+  Rejected = 'rejected',
+  Suspended = 'suspended',
 }
 
 export enum AppType {
@@ -243,6 +252,17 @@ export interface CreateCarPayload {
   rating?: number
   co2?: number
   blockOnPay?: boolean
+
+  // P2P (host-listed cars)
+  status?: string
+  hostCar?: boolean
+  make?: string
+  carModel?: string
+  year?: number
+  minRentalDays?: number
+  maxRentalDays?: number
+  registrationDocument?: string
+  images?: string[]
 }
 
 export interface UpdateCarPayload extends CreateCarPayload {
@@ -574,7 +594,68 @@ export interface Car {
   trips: number
   co2?: number
   blockOnPay?: boolean
+
+  // P2P (host-listed cars)
+  status?: CarStatus
+  hostCar?: boolean
+  make?: string
+  carModel?: string
+  year?: number
+  minRentalDays?: number
+  maxRentalDays?: number
+  registrationDocument?: string
+  images?: string[]
+  rejectionReason?: string
   [propKey: string]: any
+}
+
+export interface CarUnavailability {
+  _id: string
+  car: string
+  from: Date
+  to: Date
+  reason?: string
+}
+
+export interface UpsertCarUnavailabilityPayload {
+  car: string
+  from: Date
+  to: Date
+  reason?: string
+}
+
+export interface UpsertHostCarPayload {
+  _id?: string
+  make: string
+  carModel: string
+  year: number
+  licensePlate: string
+  locations: string[]
+  dailyPrice: number
+  deposit: number
+  minRentalDays?: number
+  maxRentalDays?: number
+  type: string
+  gearbox: string
+  range: string
+  aircon: boolean
+  seats: number
+  doors: number
+  fuelPolicy: string
+  mileage: number
+  multimedia?: string[]
+  image?: string
+  images?: string[]
+  registrationDocument?: string
+}
+
+export interface ReviewCarPayload {
+  status: CarStatus
+  rejectionReason?: string
+}
+
+export interface GetHostCarsBody {
+  statuses?: CarStatus[]
 }
 
 export interface Data<T> {

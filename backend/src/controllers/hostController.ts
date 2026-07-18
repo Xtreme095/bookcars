@@ -563,6 +563,16 @@ export const reviewHost = async (req: Request, res: Response) => {
 
     await user.save()
 
+    // suspending a host takes their live cars off the platform;
+    // reactivation does NOT auto-relist them — cars go back through review
+    if (status === bookcarsTypes.HostStatus.Suspended) {
+      const Car = (await import('../models/Car')).default
+      await Car.updateMany(
+        { supplier: user._id, hostCar: true, status: bookcarsTypes.CarStatus.Active },
+        { $set: { status: bookcarsTypes.CarStatus.Suspended, available: false } },
+      )
+    }
+
     // notify the host in their language
     i18n.locale = user.language
     const frontendHostUrl = helper.joinURL(env.FRONTEND_HOST, 'host')

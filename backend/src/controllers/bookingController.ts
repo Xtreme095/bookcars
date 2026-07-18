@@ -11,6 +11,7 @@ import Booking from '../models/Booking'
 import User from '../models/User'
 import Token from '../models/Token'
 import Car from '../models/Car'
+import CarUnavailability from '../models/CarUnavailability'
 import Location from '../models/Location'
 import Notification from '../models/Notification'
 import NotificationCounter from '../models/NotificationCounter'
@@ -275,6 +276,55 @@ export const checkout = async (req: Request, res: Response) => {
     const supplier = await User.findById(body.booking.supplier)
     if (!supplier) {
       throw new Error(`Supplier ${body.booking.supplier} not found`)
+    }
+
+    // P2P booking guards: the car must be live and the rental window bookable
+    const bookingCar = await Car.findById(body.booking.car)
+    if (!bookingCar) {
+      throw new Error(`Car ${body.booking.car} not found`)
+    }
+    if (!bookingCar.available) {
+      res.status(400).send('Car is not available')
+      return
+    }
+    const bookingFrom = new Date(body.booking.from!)
+    const bookingTo = new Date(body.booking.to!)
+    const rentalDays = helper.days(bookingFrom, bookingTo)
+    if (bookingCar.minRentalDays && rentalDays < bookingCar.minRentalDays) {
+      res.status(400).send('Rental period is shorter than the minimum rental days of the car')
+      return
+    }
+    if (bookingCar.maxRentalDays && rentalDays > bookingCar.maxRentalDays) {
+      res.status(400).send('Rental period is longer than the maximum rental days of the car')
+      return
+    }
+    const unavailabilityOverlap = await CarUnavailability.exists({
+      car: bookingCar._id,
+      from: { $lte: bookingTo },
+      to: { $gte: bookingFrom },
+    })
+    if (unavailabilityOverlap) {
+      res.status(400).send('Car is unavailable during the requested period')
+      return
+    }
+    if (bookingCar.hostCar && bookingCar.blockOnPay) {
+      // hard double-booking guard for host cars
+      const overlappingBooking = await Booking.exists({
+        car: bookingCar._id,
+        status: {
+          $in: [
+            bookcarsTypes.BookingStatus.Paid,
+            bookcarsTypes.BookingStatus.Reserved,
+            bookcarsTypes.BookingStatus.Deposit,
+          ],
+        },
+        from: { $lte: bookingTo },
+        to: { $gte: bookingFrom },
+      })
+      if (overlappingBooking) {
+        res.status(400).send('Car is already booked during the requested period')
+        return
+      }
     }
 
     if (driver) {
