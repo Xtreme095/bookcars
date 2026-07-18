@@ -37,6 +37,7 @@ import {
   Diversity3 as HostsIcon,
   NoCrash as HostCarsIcon,
   Payments as PayoutsIcon,
+  HowToReg as VerificationsIcon,
 } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import * as bookcarsTypes from ':bookcars-types'
@@ -45,6 +46,7 @@ import { strings } from '@/lang/header'
 import { strings as commonStrings } from '@/lang/common'
 import { strings as hostStrings } from '@/lang/hosts'
 import { strings as payoutStrings } from '@/lang/payouts'
+import { strings as verificationStrings } from '@/lang/verifications'
 import * as UserService from '@/services/UserService'
 import * as BankDetailsService from '@/services/BankDetailsService'
 import Avatar from './Avatar'
@@ -362,6 +364,15 @@ const Header = ({
                     >
                       <ListItemIcon><PayoutsIcon /></ListItemIcon>
                       <ListItemText primary={payoutStrings.PAYOUTS} />
+                    </ListItem>
+                    <ListItem
+                      onClick={() => {
+                        navigate('/verifications')
+                        handleSideMenuClose()
+                      }}
+                    >
+                      <ListItemIcon><VerificationsIcon /></ListItemIcon>
+                      <ListItemText primary={verificationStrings.VERIFICATIONS} />
                     </ListItem>
                   </>
                 )}

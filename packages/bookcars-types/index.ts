@@ -535,6 +535,11 @@ export interface SubmitVerificationPayload {
   idBack?: string
 }
 
+export interface RenterVerificationInfo {
+  documents: RenterDocuments
+  verification?: RenterVerification | null
+}
+
 export interface ReviewVerificationPayload {
   status: VerificationStatus
   rejectionReason?: string

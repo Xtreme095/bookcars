@@ -1,0 +1,62 @@
+div.verifications {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  height: calc(100vh - 64px);
+}
+
+div.verifications .verifications-toolbar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+div.verifications .verifications-grid {
+  flex: 1;
+  min-height: 0;
+}
+
+div.verifications .renter-cell {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+}
+
+div.verifications .avatar-small {
+  width: 28px;
+  height: 28px;
+}
+
+div.verification-dialog div.renter-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 15px;
+}
+
+div.verification-dialog div.documents {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+div.verification-dialog div.documents button {
+  justify-content: flex-start;
+}
+
+@media only screen and (max-width: 960px) {
+  div.verifications {
+    padding: 10px;
+    height: auto;
+  }
+
+  div.verifications .verifications-grid {
+    min-height: 400px;
+  }
+}

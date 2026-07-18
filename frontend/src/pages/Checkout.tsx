@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
+  Alert,
   OutlinedInput,
   InputLabel,
   FormControl,
@@ -41,6 +42,8 @@ import * as BookingService from '@/services/BookingService'
 import { strings as commonStrings } from '@/lang/common'
 import { strings as csStrings } from '@/lang/cars'
 import { strings } from '@/lang/checkout'
+import { strings as verificationStrings } from '@/lang/verification'
+import * as VerificationService from '@/services/VerificationService'
 import * as helper from '@/utils/helper'
 import * as UserService from '@/services/UserService'
 import * as CarService from '@/services/CarService'
@@ -105,6 +108,9 @@ const Checkout = () => {
   // const [distance, setDistance] = useState('')
   const [licenseRequired, setLicenseRequired] = useState(false)
   const [license, setLicense] = useState<string | null>(null)
+  // P2P: renter identity verification state (host cars only)
+  const [verificationStatus, setVerificationStatus] = useState<bookcarsTypes.VerificationStatus | null>(null)
+  const [verificationError, setVerificationError] = useState(false)
   const [openMapDialog, setOpenMapDialog] = useState(false)
   const [payPalLoaded, setPayPalLoaded] = useState(false)
   const [payPalInit, setPayPalInit] = useState(false)
@@ -123,6 +129,9 @@ const Checkout = () => {
   const bookingDetailHeight = env.SUPPLIER_IMAGE_HEIGHT + 10
   const days = bookcarsHelper.days(from, to)
   const daysLabel = from && to && `${helper.getDaysShort(days)} (${bookcarsHelper.capitalize(format(from, _format, { locale: _locale }))} - ${bookcarsHelper.capitalize(format(to, _format, { locale: _locale }))})`
+
+  // P2P: booking a host car is blocked until the renter's identity is verified
+  const verificationGate = !!car?.hostCar && (!authenticated || verificationStatus !== bookcarsTypes.VerificationStatus.Approved)
 
   const schema = createSchema(car)
 
@@ -196,6 +205,12 @@ const Checkout = () => {
 
       if (car.supplier.licenseRequired && !license) {
         setLicenseRequired(true)
+        return
+      }
+
+      // P2P: host cars require a signed-in renter with approved identity verification
+      if (car.hostCar && (!authenticated || verificationStatus !== bookcarsTypes.VerificationStatus.Approved)) {
+        setVerificationError(true)
         return
       }
 
@@ -368,6 +383,12 @@ const Checkout = () => {
         return
       }
 
+      // P2P: host cars require an identity-verified renter
+      if (_car.hostCar && _user) {
+        const verificationInfo = await VerificationService.getVerification()
+        setVerificationStatus(verificationInfo?.verification?.status || null)
+      }
+
       _pickupLocation = await LocationService.getLocation(pickupLocationId)
 
       if (!_pickupLocation) {
@@ -513,6 +534,33 @@ const Checkout = () => {
                         </div>
                       </div>
                     </div>
+
+                    {verificationGate && (
+                      <div className="verification-gate">
+                        <Alert
+                          severity={verificationStatus === bookcarsTypes.VerificationStatus.Pending ? 'info' : 'warning'}
+                          action={(
+                            <Button
+                              color="inherit"
+                              size="small"
+                              onClick={() => navigate(authenticated ? '/settings' : '/sign-in')}
+                            >
+                              {authenticated
+                                ? verificationStrings.GO_TO_SETTINGS
+                                : verificationStrings.SIGN_IN}
+                            </Button>
+                          )}
+                        >
+                          <strong>{verificationStrings.VERIFICATION_REQUIRED_TITLE}</strong>
+                          <br />
+                          {!authenticated
+                            ? verificationStrings.VERIFICATION_REQUIRED_SIGN_IN
+                            : verificationStatus === bookcarsTypes.VerificationStatus.Pending
+                              ? verificationStrings.VERIFICATION_REQUIRED_PENDING
+                              : verificationStrings.VERIFICATION_REQUIRED_UNVERIFIED}
+                        </Alert>
+                      </div>
+                    )}
 
                     {!authenticated && (
                       <div className="driver-details">
@@ -979,7 +1027,7 @@ const Checkout = () => {
                             variant="contained"
                             className="btn-checkout btn-margin-bottom"
                             aria-label="Checkout"
-                            disabled={isSubmitting || (payPalLoaded && !payPalInit)}
+                            disabled={isSubmitting || (payPalLoaded && !payPalInit) || verificationGate}
                           >
                             {
                               (isSubmitting || (payPalLoaded && !payPalInit))
@@ -1021,6 +1069,7 @@ const Checkout = () => {
                     {paymentFailed && <Error message={strings.PAYMENT_FAILED} />}
                     {recaptchaError && <Error message={commonStrings.RECAPTCHA_ERROR} />}
                     {licenseRequired && <Error message={strings.LICENSE_REQUIRED} />}
+                    {verificationError && <Error message={verificationStrings.VERIFICATION_REQUIRED_ERROR} />}
                   </div>
                 </form>
               </Paper>

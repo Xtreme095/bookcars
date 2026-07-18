@@ -293,10 +293,56 @@ rental agreements (Phase 4).
 - Download buttons: frontend Booking page (renter) and admin Update Booking
   (download + regenerate).
 
-## Renter verification *(planned — Phase 5)*
+## Renter verification (Phase 5 — implemented)
 
-- License front/back + ID upload, `User.verification` status, manual admin review
-  queue, checkout gate; provider interface so a KYC vendor can be plugged in later.
+Renters must be identity-verified before booking a **host car** (legacy supplier
+cars keep the per-supplier `licenseRequired` behavior).
+
+`User.documents` + `User.verification` subdocuments:
+
+```
+documents: {
+  licenseFront / licenseBack / idFront / idBack: String   // filenames
+}
+verification: {
+  status: 'pending' | 'approved' | 'rejected'   // indexed
+  method: String            // provider name, default 'manual'
+  submittedAt: Date
+  reviewedBy: ObjectId → User
+  reviewedAt: Date
+  rejectionReason: String
+}
+```
+
+- Documents are stored in the private host-documents folder (`BC_CDN_HOST_DOCUMENTS`,
+  outside the public CDN) and streamed only to the owner or an admin via
+  `GET /api/verification-document/:userId/:type`.
+- Renter flow (frontend Settings → "Identity verification"): upload license
+  front/back + ID front (ID back optional) → submit → status pending → admin
+  notification. After a rejection the section shows the reason and allows
+  re-submission (previously uploaded documents are kept unless replaced).
+- Admin queue (`/verifications`, admin-gated): pending by default, status filter +
+  keyword search, per-row review dialog with document viewer and
+  approve / reject-with-reason actions. Renters are notified by email and in-app
+  notification in their language (en/fr/es/hr).
+- On approval the license front is also copied into the legacy public licenses
+  folder and `User.license` is set, so per-supplier `licenseRequired` checks keep
+  working for verified renters.
+- Checkout gate: for `hostCar` bookings the API rejects anonymous inline-driver
+  checkout and requires the driver's `verification.status === 'approved'`
+  (`POST /api/checkout` → 400 "Renter verification required"). The frontend
+  Checkout page shows a sign-in / verify-identity notice and disables booking
+  until verified; pending submissions show a "being reviewed" notice.
+
+### Pluggable KYC providers
+
+`backend/src/verification/` defines a `VerificationProvider` interface
+(`{ name, submit(user) => VerificationStatus }`). The default `manual` provider
+returns `pending` and notifies the admin. A third-party vendor (e.g. Veriff,
+Onfido) can be integrated by implementing the interface, registering it in
+`verification/index.ts`, and setting `BC_VERIFICATION_PROVIDER` — a synchronous
+vendor may return `approved` directly, an async one returns `pending` and its
+webhook applies the final decision through the same review endpoint logic.
 
 ## i18n
 
