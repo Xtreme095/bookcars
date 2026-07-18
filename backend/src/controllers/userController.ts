@@ -11,7 +11,6 @@ import * as bookcarsTypes from ':bookcars-types'
 import i18n from '../lang/i18n'
 import * as env from '../config/env.config'
 import User from '../models/User'
-import Booking from '../models/Booking'
 import Token from '../models/Token'
 import PushToken from '../models/PushToken'
 import * as helper from '../utils/helper'
@@ -20,7 +19,7 @@ import * as mailHelper from '../utils/mailHelper'
 import Notification from '../models/Notification'
 import NotificationCounter from '../models/NotificationCounter'
 import Car from '../models/Car'
-import AdditionalDriver from '../models/AdditionalDriver'
+import * as cleanupHelper from '../utils/cleanupHelper'
 import * as logger from '../utils/logger'
 
 /**
@@ -1841,29 +1840,17 @@ export const deleteUsers = async (req: Request, res: Response) => {
           }
         }
 
+        // P2P: identity documents (host application + renter verification)
+        await cleanupHelper.deleteIdentityDocuments(user)
+
         if (user.type === bookcarsTypes.UserType.Supplier) {
-          const additionalDrivers = (
-            await Booking
-              .find(
-                { supplier: id, _additionalDriver: { $ne: null } },
-              )
-              .select('_additionalDriver -_id')
-              .lean()
-          ).map((b) => b._additionalDriver)
-          await AdditionalDriver.deleteMany({ _id: { $in: additionalDrivers } })
-          await Booking.deleteMany({ supplier: id })
-          const cars = await Car.find({ supplier: id })
-          await Car.deleteMany({ supplier: id })
-          for (const car of cars) {
-            if (car.image) {
-              const image = path.join(env.CDN_CARS, car.image)
-              if (await helper.pathExists(image)) {
-                await asyncFs.unlink(image)
-              }
-            }
-          }
+          await cleanupHelper.deleteOwnedFleet(id.toString())
         } else if (user.type === bookcarsTypes.UserType.User) {
-          await Booking.deleteMany({ driver: id })
+          if (user.host || (await Car.exists({ supplier: id }))) {
+            // hosts own cars and bookings like a supplier
+            await cleanupHelper.deleteOwnedFleet(id.toString())
+          }
+          await cleanupHelper.deleteDriverBookings(id.toString())
         }
         await NotificationCounter.deleteMany({ user: id })
         await Notification.deleteMany({ user: id })
