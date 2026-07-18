@@ -9,6 +9,7 @@ import Footer from '@/components/Footer'
 import env from '@/config/env.config'
 import { strings } from '@/lang/host-cars'
 import { strings as carsStrings } from '@/lang/cars'
+import { strings as earningsStrings } from '@/lang/host-earnings'
 import * as helper from '@/utils/helper'
 import * as UserService from '@/services/UserService'
 import * as HostService from '@/services/HostService'
@@ -38,9 +39,14 @@ const HostCars = () => {
           <div className="host-cars">
             <div className="host-cars-header">
               <h1>{strings.MY_VEHICLES}</h1>
-              <Button variant="contained" className="btn-primary" startIcon={<AddIcon />} onClick={() => navigate('/host/car')}>
-                {strings.NEW_VEHICLE}
-              </Button>
+              <div className="host-cars-header-actions">
+                <Button variant="outlined" color="primary" onClick={() => navigate('/host/earnings')}>
+                  {earningsStrings.EARNINGS}
+                </Button>
+                <Button variant="contained" className="btn-primary" startIcon={<AddIcon />} onClick={() => navigate('/host/car')}>
+                  {strings.NEW_VEHICLE}
+                </Button>
+              </div>
             </div>
 
             {cars.length === 0 ? (

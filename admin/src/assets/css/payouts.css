@@ -1,0 +1,42 @@
+div.payouts {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  height: calc(100vh - 64px);
+}
+
+div.payouts .payouts-toolbar {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+div.payouts .period-field {
+  min-width: 90px;
+}
+
+div.payouts .payouts-grid {
+  flex: 1;
+  min-height: 0;
+}
+
+div.payouts .actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 100%;
+}
+
+@media only screen and (max-width: 960px) {
+  div.payouts {
+    padding: 10px;
+    height: auto;
+  }
+
+  div.payouts .payouts-grid {
+    min-height: 400px;
+  }
+}

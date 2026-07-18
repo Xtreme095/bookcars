@@ -201,15 +201,77 @@ their cars remain manageable). The car search pipelines already join owners by
 id, so active host cars flow through search, checkout and booking machinery
 without further changes.
 
-## Revenue share & payouts *(planned — Phase 3)*
+## Revenue share & payouts (Phase 3 — implemented)
 
-- Per completed booking, a ledger entry (repaired `CommissionTransaction`) records
-  gross amount, platform fee and host share; commission resolution:
-  `host.commissionPct ?? Setting.platformCommissionPct`.
-- Monthly `Payout` per host: gross, fee, share, guaranteed-minimum top-up,
-  `amount = max(share, guaranteedMonthlyMinimum)`, statement PDF (HR/EN),
-  admin dashboard with mark-as-paid and SEPA-compatible CSV export
-  (`IBAN;amount;reference;name`).
+### Ledger
+
+Every completed payment creates exactly one ledger entry (`CommissionTransaction`,
+unique per booking) recording gross amount, platform fee and host share:
+
+- **Commission resolution:** `host.commissionPct` (per-host override, set by the
+  admin on the host review page) → legacy per-supplier `commissionPercentage`
+  (classic suppliers) → `Setting.platformCommissionPct` (global default 35, editable
+  in admin Settings).
+- **Creation points:** Stripe payment-intent checkout, Stripe session confirmation,
+  PayPal capture, and admin marking a pay-later booking Paid/PaidInFull
+  (update/updateStatus transitions). Idempotent — re-firing never duplicates.
+- **Cancellation:** transitions into Cancelled/Void set the entry to `voided`
+  unless it was already paid out (paid entries stay; refunds are a manual admin
+  process). Re-paying restores a voided entry.
+- Entries carry `hostCar` (revenue share applies) and a `payout` reference once
+  settled.
+
+### Checkout hardening
+
+The backend recomputes the booking price from the database car (including
+date-based/seasonal prices, tiered day pricing and options) and rejects
+client-sent prices outside tolerance — required once third parties are paid
+a share of the price.
+
+### Monthly payouts
+
+`Payout` — one per host per month (unique `{host, year, month}`):
+
+```
+{ host, year, month, entries[], bookingsCount,
+  grossTotal, commissionTotal, shareTotal,
+  guaranteedMinimum,                       // snapshot of host.guaranteedMonthlyMinimum
+  amount = max(shareTotal, guaranteedMinimum),
+  currency: 'EUR', status: pending | paid,
+  paidAt, reference, statementFile }
+```
+
+`POST /api/generate-payouts/:year/:month` (admin) builds payouts for every host
+with ledger entries in the month **and** every approved host with a guaranteed
+monthly minimum — a host with zero bookings still receives the contractual
+minimum. Regeneration is idempotent while pending and never touches paid payouts.
+`POST /api/mark-payout-paid/:id` settles the payout and its ledger entries.
+
+### Statements & SEPA export
+
+- Statement PDFs are generated per payout in the host's language (Croatian or
+  English) with bundled DejaVu Sans (č ć đ š ž render correctly), showing the
+  booking list, gross/commission/share totals, the guaranteed minimum and the
+  top-up line. Stored privately (`BC_CDN_STATEMENTS`), streamed to the owning
+  host or an admin only.
+- `GET /api/payouts-sepa/:year/:month` (admin) exports pending payouts as a
+  SEPA-compatible CSV for bank upload: `IBAN;Amount;Reference;Name`
+  (semicolon-delimited, UTF-8, CRLF).
+- Payment reference: `<contractNumber>-<YYYYMM>` (fallback: host id suffix).
+
+### UI
+
+- **Admin `/payouts`**: month/year picker, generate button, per-host rows
+  (bookings, gross, commission, share, minimum, amount, status), statement
+  download, mark-as-paid dialog with bank reference, SEPA CSV export.
+- **Frontend `/host/earnings`**: the host's monthly payout cards with totals,
+  minimum top-up visibility, statement downloads; linked from the vehicle portal.
+
+### Platform identity
+
+`BC_PLATFORM_NAME/OIB/ADDRESS/CITY/ZIP/IBAN/EMAIL` env vars (centralized in
+`env.config.ts`) identify the operating company on statements — and later on
+rental agreements (Phase 4).
 
 ## Rental agreements *(planned — Phase 4)*
 

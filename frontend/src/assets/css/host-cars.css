@@ -16,6 +16,12 @@ div.host-cars .host-cars-header {
   margin-bottom: 20px;
 }
 
+div.host-cars .host-cars-header-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
 div.host-cars .host-cars-header h1 {
   font-size: 1.5em;
   font-weight: 700;

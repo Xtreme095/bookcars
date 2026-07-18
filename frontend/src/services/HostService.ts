@@ -244,3 +244,30 @@ export const getCarUnavailabilities = (carId: string): Promise<bookcarsTypes.Car
       { withCredentials: true }
     )
     .then((res) => (res.status === 204 ? [] : res.data))
+
+/**
+ * Get the host's payouts.
+ *
+ * @returns {Promise<bookcarsTypes.Payout[]>}
+ */
+export const getHostPayouts = (): Promise<bookcarsTypes.Payout[]> =>
+  axiosInstance
+    .get(
+      '/api/host-payouts',
+      { withCredentials: true }
+    )
+    .then((res) => res.data)
+
+/**
+ * Download a payout statement PDF.
+ *
+ * @param {string} id
+ * @returns {Promise<Blob>}
+ */
+export const getPayoutStatement = (id: string): Promise<Blob> =>
+  axiosInstance
+    .get(
+      `/api/payout-statement/${encodeURIComponent(id)}`,
+      { withCredentials: true, responseType: 'blob' }
+    )
+    .then((res) => res.data)

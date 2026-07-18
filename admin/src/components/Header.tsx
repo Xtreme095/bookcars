@@ -36,6 +36,7 @@ import {
   MonetizationOn as PricingIcon,
   Diversity3 as HostsIcon,
   NoCrash as HostCarsIcon,
+  Payments as PayoutsIcon,
 } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom'
 import * as bookcarsTypes from ':bookcars-types'
@@ -43,6 +44,7 @@ import env from '@/config/env.config'
 import { strings } from '@/lang/header'
 import { strings as commonStrings } from '@/lang/common'
 import { strings as hostStrings } from '@/lang/hosts'
+import { strings as payoutStrings } from '@/lang/payouts'
 import * as UserService from '@/services/UserService'
 import * as BankDetailsService from '@/services/BankDetailsService'
 import Avatar from './Avatar'
@@ -351,6 +353,15 @@ const Header = ({
                     >
                       <ListItemIcon><HostCarsIcon /></ListItemIcon>
                       <ListItemText primary={hostStrings.CARS} />
+                    </ListItem>
+                    <ListItem
+                      onClick={() => {
+                        navigate('/payouts')
+                        handleSideMenuClose()
+                      }}
+                    >
+                      <ListItemIcon><PayoutsIcon /></ListItemIcon>
+                      <ListItemText primary={payoutStrings.PAYOUTS} />
                     </ListItem>
                   </>
                 )}

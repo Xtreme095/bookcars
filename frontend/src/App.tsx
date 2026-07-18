@@ -43,6 +43,7 @@ const BecomeAHost = lazy(() => import('@/pages/BecomeAHost'))
 const HostApplication = lazy(() => import('@/pages/HostApplication'))
 const HostCars = lazy(() => import('@/pages/HostCars'))
 const HostCar = lazy(() => import('@/pages/HostCar'))
+const HostEarnings = lazy(() => import('@/pages/HostEarnings'))
 
 const AppLayout = () => {
   const location = useLocation()
@@ -105,6 +106,7 @@ const router = createBrowserRouter([
       { path: 'host', element: <HostApplication /> },
       { path: 'host/cars', element: <HostCars /> },
       { path: 'host/car', element: <HostCar /> },
+      { path: 'host/earnings', element: <HostEarnings /> },
       ...(env.HIDE_SUPPLIERS ? [] : [{ path: 'suppliers', element: <Suppliers /> }]),
       { path: '*', element: <NoMatch /> }
     ]
